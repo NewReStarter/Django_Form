@@ -1,0 +1,151 @@
+﻿#summaryDiv .collection {
+  padding-top: 0px;
+}
+#summaryDiv .category {
+	margin-bottom: 20px;
+}
+#summaryDiv h4.category-heading {
+	font-size: 21px;
+	line-height: inherit;
+	border-bottom: solid 2px #115798;
+	color: #115798;
+	padding-left: 0px;
+}
+#summaryDiv h4.sub-category-heading {
+	padding-left: 0px;
+	color: #337ab7;
+}
+#summaryDiv .sub-category {
+	margin-bottom: 20px;
+	padding: 0px;
+}
+#summaryDiv .category li.list-group-item {
+	padding: 5px 15px;
+}
+#summaryDiv div.record-count {
+	margin: 10px 0px;
+	padding: 0px;
+}
+#summaryDiv .spilt-left {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+#summaryDiv .spilt-right {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+#summaryDiv .spilt-right .list-item {
+	margin-left: -1px;
+}
+#summaryDiv .item-group,
+#summaryDiv .list-item span, {
+	padding-left: 0px;
+}
+#summaryDiv .list-item {
+	padding: 5px 15px;
+	border: solid 1px #ddd;
+	margin-bottom: -1px;
+	height: inherit;
+	line-height: inherit;
+}
+#summaryDiv .list-item span {
+	overflow: auto;
+	word-wrap: break-word;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+#summaryDiv .list-item span.custom-label {
+	font-weight: bold;
+	padding-right: 15px;
+}
+#summaryDiv .collection {
+	margin-bottom: 20px;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+#summaryDiv .long-question {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) { 
+  body {
+    padding: 0px !important;
+  }
+	#summaryDiv .spilt-left {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+	#summaryDiv .spilt-right {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+	#summaryDiv .spilt-right .list-item {
+		margin-left: 0px;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) { 
+   #summaryDiv .hack-height {
+      height: 40px;
+    }
+} 
+
+/*  print style */
+@media print and (min-width: 300px) {
+  .hidden-print {
+    display: none;
+  }
+  #summaryDiv {
+    background: #fff !important;
+  }
+  #summaryDiv .hack-height {
+    height: 20px;
+  }
+  #summaryDiv .page-header {
+    margin-top: 10px;
+    margin-bottom: 0px;
+  }
+  #summaryDiv.container {
+    width: auto;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  #summaryDiv h1, #summaryDiv h1 span{
+    font-size: 16px;
+  }
+  #summaryDiv h1 small, #summaryDiv h4.category-heading {
+    font-size: 14px;
+  }
+  #summaryDiv h4.sub-category-heading {
+    font-size: 12px;
+    text-decoration: underline;
+  }
+  #summaryDiv p, #summaryDiv span{
+    font-size: 8pt;
+  }
+  #summaryDiv span.label, #summaryDiv .recordIndex {
+    font-size: 7pt;
+  }
+  #summaryDiv .category {
+    margin-bottom: 15px;
+  }
+  #summaryDiv .collection, #summaryDiv .sub-category {
+    margin-bottom: 10px;
+  }
+  #summaryDiv .sub-category-heading {
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+  #summaryDiv div.record-count {
+    margin-top: 0px;
+    margin-bottom: 3px;
+  }
+  #summaryDiv .list-item {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+  }
+}
+

@@ -1237,7 +1237,7 @@ msgstr "Róznica w wybranych wersjach"
 #: templates/xadmin/views/model_history.html:58
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+"myadmin site."
 msgstr ""
 "Ten obiekt nie posiada historii zmian. Prawdopodobnie nie został on dodany "
 "przez panel administratora."

@@ -1234,7 +1234,7 @@ msgstr "Comparar Versões Selecionadas"
 #: templates/xadmin/views/model_history.html:58
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+"myadmin site."
 msgstr ""
 "Este objeto não possui um histórico de mudança. Provavelmente não foi "
 "adicionado pelo site de administração."

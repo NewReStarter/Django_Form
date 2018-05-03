@@ -1,0 +1,164 @@
+﻿/* Sticky footer styles
+-------------------------------------------------- */
+.lasb {
+	border-radius: 1em;
+}
+html {
+  position: relative;
+  min-height: 100%;
+}
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	/* Set the fixed height of the footer here */
+	height: 41px;
+}
+body {
+	margin-bottom: 45px;
+}
+.footer p {
+	border-top: 1px solid #e7e7e7;
+	padding-top: 10px;
+}
+/* Sticky footer styles*/
+
+/*hidden modal scroll-bar*/
+/*.modal {
+	overflow-y:hidden; 
+}
+.modal-header {
+	cursor: move;
+}*/
+.no-padding-left {
+	padding-left: 0px;
+}
+.no-margin-top {
+	margin-top: 0px;
+}
+.logo {
+	margin-top: 15px;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.clear {
+	clear: both;
+}
+.full-block{
+	position: relative;
+	padding: 15px ;
+	margin: 0 -15px 15px;
+	margin-right: 0;
+	margin-left: 0;
+	background-color: #fff;
+	border:1px solid #ddd;
+	border-radius: 4px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+
+}
+.clickable {
+	cursor: pointer;
+}
+.td-checkbox {
+	text-align: center;
+	vertical-align: middle !important;
+}
+.pad10{
+	padding:10px;
+}
+.custom-text-success {
+	color: #008800;
+}
+.custom-text-warning {
+	color: #FF9500;
+}
+.custom-text-danger {
+	color: #FF3B30;
+}
+.custom-text-importance {
+	color: #FF4400;
+}
+
+.bs-callout {
+	padding: 20px;
+	margin: 20px 0;
+	border: 1px solid #eee;
+	border-left-width: 5px;
+	border-radius: 3px;
+}
+.bs-callout-info {
+	border-left-color: #1b809e;
+}
+.bs-callout-text-info {
+	color: #1b809e;
+}
+.bs-callout-danger {
+	border-left-color: #ce4844;
+}
+.bs-callout-text-danger {
+	color: #ce4844;
+}
+.bs-callout-warning {
+	border-left-color: #aa6708;
+}
+
+/*override bootstrap css*/
+.has-error .help-block,
+.has-error .control-label,
+.has-error .radio, .has-error .checkbox,
+.has-error .radio-inline, .has-error .checkbox-inline {
+	color: #CC0000;
+}
+
+.has-error .form-control {
+	border-color: #CC0000;
+}
+.alert-danger {
+	border-color: #CC0000;
+	color: #CC0000;
+}
+.alert-success {
+	border-color: #008800;
+	color: #008800;
+}
+.alert-info {
+	border-color: #31708f;
+}
+.alert-warning {
+	border-color: #FF6800;
+	color: #FF6800;
+	background-color: #FFECD7;
+}
+/*override bootstrap css*/
+.underline {
+	text-decoration: underline;
+}
+.bold {
+	font-weight: bold;
+}
+a:hover{
+	cursor:pointer;
+}
+.hoverable:hover{
+	cursor:pointer;
+}
+.working a,#attachmentTable a{
+	word-break: break-all;
+}
+.input-group-addon:hover{
+cursor:pointer;
+}
+.fa-spin-fast{
+	-webkit-animation: fa-spin 0.4s infinite steps(9);
+	animation: fa-spin 0.4s infinite steps(9);
+}
+
+/*Under Development*/
+.develop {
+	background-color: yellow;
+}

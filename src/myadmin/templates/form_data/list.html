@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/bootstrap-4.0.0-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="/static/code/css/highcharts.scss/highcharts.css">
+    <script src="/static/jquery.min.js"></script>
+    <script src="/static/bootstrap-4.0.0-dist/js/bootstrap.js"></script>
+    <script src="/static/bootstrap-table/bootstrap-table.js"></script>
+    <script src="/static/bootstrap-table/locale/bootstrap-table-en-US.js"></script>
+    <script src="/static/layui/layui.all.js"></script>
+    <script src="/static/code/highcharts.js"></script>
+
+    <style>
+        #toolbar {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar" class="btn-group">
+    <button type="button" class="btn btn-default" id="answerDetail">Answers</button>
+    <button type="button" class="btn btn-default" id="ChangeStatus">Change Status</button>
+</div>
+<div class="layui-row layui-col-space10">
+    <div class="layui-col-md4">
+        <div id="container1"></div>
+    </div>
+    <div class="layui-col-md4">
+        <div id="container2"></div>
+    </div>
+    <div class="layui-col-md4">
+        <div id="container3"></div>
+    </div>
+</div>
+<table id="table"></table>
+<script type="text/javascript">
+    var layer = layui.layer;
+    $('#table').bootstrapTable({
+        url: '/myadmin/form_data/GetList',
+        method: 'post',
+        pagination: true,
+        paginationLoop: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        singleSelect: true,
+        idField: 'id',
+        sortName: 'create_time',
+        sortName: 'id',
+        paginationPreText: 'next',
+        paginationNextText: 'previous',
+        clickToSelect: true,
+        toolbar: '#toolbar',
+        toolbarAlign: 'left',
+        smartDisplay: true,
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        columns: [
+            {checkbox: true},
+            {field: 'id', title: 'id'},
+            {field: 'q0', title: 'q1.title'},
+            {field: 'q1', title: 'q2.title'},
+            {field: 'q2', title: 'q3.title'},
+            {field: 'q3', title: 'q4.title'},
+            {field: 'q4', title: 'q5.title'},
+            {field: 'q5', title: 'q6.title'},
+            {field: 'q6', title: 'q7.title'},
+            {field: 'q7', title: 'q8.title'},
+            {field: 'q8', title: 'q9.title'},
+            {field: 'q9', title: 'q10.title'},
+            {field: 'status', title: 'status'},
+            {field: 'modify_time', title: 'modify_time'},
+        ],
+        ajaxOptions: {
+            headers: {"X-CSRFToken": '{{ token }}'}
+        },
+        queryParams: function (params) {
+            params.csrfmiddlewaretoken = '{{ token }}';
+            return params;
+        }
+    });
+    $('#answerDetail').click(function () {
+        var rows = $('#table').bootstrapTable('getSelections');
+        if (rows.length == 0)
+            layer.msg('Please select at least one line');
+        else
+            layer.open({
+                type: 2,
+                title: 'Adding',
+                area: ['80%', '100%'],
+                content: '/myadmin/form_data/detail?id=' + rows[0].id,
+            });
+    });
+    $('#container1').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: 'Age distribution'
+        },
+        tooltip: {
+            headerFormat: '{series.name}<br>',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Age distribution Pie',
+            data: [
+                {% for key,val in data.items %}
+                    {% if not forloop.last %}
+                        ['{{ key }}',{{ val.age }}/{{ data.all }}*100 ],
+                    {% endif %}
+                {% endfor %}
+
+                ]
+            }]
+        });
+        $('#container2').highcharts({
+            title: {
+                text: 'English Proficiency'
+            },
+            yAxis: {
+                title: {
+                    text: 'Number of people who mastered English'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    },
+                    pointStart: 2010
+                }
+            },
+            series: [{
+                name: '10-20',
+                data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
+            }, {
+                name: '20-30',
+                data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+            }, {
+                name: '30-40',
+                data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+            }, {
+                name: '40-50',
+                data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+            }, {
+                name: '50-60',
+                data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
+            },],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+        });
+        $('#container3').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Age Distribution Line'
+            },
+            xAxis: {
+                categories: ['english','chinese','french'],
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of people',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' Million'
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        allowOverlap: true
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -40,
+                y: 100,
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+                shadow: true
+            },
+            credits: {
+                enabled: false
+            },
+            series: [
+            {% for key,val in data.items %}
+                {% if not forloop.last %}
+                    {
+                    name: '{{ key }}',
+                    data: [{{ val.english }},{{ val.chinese }},{{ val.french }}]
+                    },
+                {% endif %}
+            {% endfor %}
+            ]
+        });
+        $('#ChangeStatus').click(function () {
+            var rows = $('#table').bootstrapTable('getSelections');
+            if (rows.length == 0)
+                layer.msg('please select at least one line');
+            else
+                layer.prompt({
+                    title: 'ChangeStatus'
+                }, function (value, index, elem) {
+                    $.ajax({
+                        url: '/myadmin/form_data/ChangeStatus',
+                        type: 'post',
+                        data: {
+                            id: rows[0].id,
+                            'status': value
+                        },
+                        success: function (data) {
+                            if (data == 200) {
+                                layer.msg('successful')
+                                Refresh();
+                            }
+                        },
+                        error: function (eve, err) {
+                            layer.msg(err)
+                        }
+                    })
+                    layer.close(index);
+                })
+        });
+
+        function Refresh() {
+            $('#table').bootstrapTable('refresh', {silent: true})
+        }
+</script>
+</body>
+</html>

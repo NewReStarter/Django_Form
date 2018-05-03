@@ -13,19 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.urls import path, re_path
 import xadmin
-from django_pdfkit import PDFView
+from myadmin import views as myadmin_views
 
 from myapp.views import *
 
 urlpatterns = [
-    path('admin/', xadmin.site.urls),
+    path('myadmin/', myadmin_views.target),
+    path('myadmin/<str:controller_name>/<str:action_name>', myadmin_views.target),
+    path('xadmin/', xadmin.site.urls),
     # re_path('^admin-pdf/$', PDFView.as_view()),
     re_path('^$', FormView.as_view(), name="Form"),
     re_path('^form_data$', FormView.as_view(), name="form_data"),
-    re_path('^favicon.ico$',  RedirectView.as_view(url=r'static/favicon.ico')),
-    # re_path('^download$', views.render_pdf),
+    re_path('^favicon.ico$', RedirectView.as_view(url=r'static/favicon.ico')),
 ]

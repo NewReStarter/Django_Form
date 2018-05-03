@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login System for Database Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+</head>
+<body style="background-color: #ffffff;">
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md3">
+        </div>
+        <div class="layui-col-md6">
+            <form class="layui-form" style="margin-top:35%; ">
+                <blockquote class="layui-elem-quote">Login</blockquote>
+                {% csrf_token %}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">User Name</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" required lay-verify="required" placeholder="User Name"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Password</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" required lay-verify="required" placeholder="Password"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="login">Submit</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">Reset</button>
+                    </div>
+                </div>
+                <hr/>
+            </form>
+        </div>
+        <div class="layui-col-md3">
+        </div>
+    </div>
+</div>
+<script src="/static/layui/layui.all.js"></script>
+<script type="text/javascript">
+    var form = layui.form;
+    var $ = layui.jquery;
+    form.on('submit(login)', function (data) {
+        $.ajax({
+            url: '/myadmin/home/loginIn',
+            data: data.field,
+            type: 'post',
+            success: function (data) {
+                data = JSON.parse(data);
+                console.info(data);
+                if (data.code == 200) {
+                    window.location.href = "/myadmin/home/index";
+                } else {
+                    layer.msg(data.msg);
+                }
+            }
+        })
+        return false;
+    })
+</script>
+</body>
+</html>

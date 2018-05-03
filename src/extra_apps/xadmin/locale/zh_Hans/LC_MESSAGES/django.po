@@ -1291,7 +1291,7 @@ msgstr "查看所选版本的不同"
 #: .\templates\xadmin\views\model_history.html:58
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+"myadmin site."
 msgstr "该对象没有变更历史记录。可能从未通过这个管理站点添加。"
 
 #: .\templates\xadmin\views\model_list.html:29

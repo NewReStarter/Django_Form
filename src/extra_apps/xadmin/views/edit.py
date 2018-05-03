@@ -87,7 +87,7 @@ class ModelFormAdminView(ModelAdminView):
     @filter_hook
     def formfield_for_dbfield(self, db_field, **kwargs):
         # If it uses an intermediary model that isn't auto created, don't show
-        # a field in admin.
+        # a field in myadmin.
         if isinstance(db_field, models.ManyToManyField) and not db_field.remote_field.through._meta.auto_created:
             return None
 
@@ -156,7 +156,7 @@ class ModelFormAdminView(ModelAdminView):
     @filter_hook
     def get_model_form(self, **kwargs):
         """
-        Returns a Form class for use in the admin add view. This is used by
+        Returns a Form class for use in the myadmin add view. This is used by
         add_view and change_view.
         """
         if self.exclude is None:
@@ -444,7 +444,7 @@ class CreateAdminView(ModelFormAdminView):
 
             # Figure out where to redirect. If the user has change permission,
             # redirect to the change-list page for this object. Otherwise,
-            # redirect to the admin index.
+            # redirect to the myadmin index.
             if "_redirect" in request.POST:
                 return request.POST["_redirect"]
             elif self.has_view_permission():
@@ -538,7 +538,7 @@ class UpdateAdminView(ModelFormAdminView):
             self.message_user(msg, 'success')
             # Figure out where to redirect. If the user has change permission,
             # redirect to the change-list page for this object. Otherwise,
-            # redirect to the admin index.
+            # redirect to the myadmin index.
             if "_redirect" in request.POST:
                 return request.POST["_redirect"]
             elif self.has_view_permission():

@@ -1,0 +1,142 @@
+﻿$(document).ready(function(){
+	// global variable
+	showPromptDialog = true;
+	isSelectedFile = false;
+	var version = navigator.appVersion;
+
+	//affix plugin
+	$("#sub-nav").affix();
+
+	// navbar collapse event
+	$(".navbar-nav li a").on("click", function(){
+		$(".navbar-collapse.collapse").removeClass("in");
+	});
+
+	// maxlength validation
+	$('.maxWordInput:not(.template)').maxlength({
+		alwaysShow: true,
+		validate: false
+	});
+
+	//plugin / object init 
+	customAlert.init();
+	formControl.init();
+	formValidator.init();
+	$('#tokenModal, #confirmModal').modal({
+		keyboard: false,
+		backdrop: "static",
+		show: false
+	});
+
+	/* Dual Nationality*/
+	$("#second_nationality option").prop("disabled", false);
+	$("#second_nationality").find("option[value='" + $("#nationality").val() + "']").prop("disabled", true);
+
+	$("#nationality option").prop("disabled", false);	
+	$("#nationality").find("option[value='" + $("#second_nationality").val() + "']").prop("disabled", true);
+
+	$("#nationality, #second_nationality").on("change", function(){
+		var selectedValue = this.value;
+		if(this.id === "nationality"){
+			$("#second_nationality option").prop("disabled", false);
+			$("#second_nationality").find("option[value='" + selectedValue + "']").prop("disabled", true);
+		}else{
+			$("#nationality option").prop("disabled", false);
+			$("#nationality").find("option[value='" + selectedValue + "']").prop("disabled", true);
+		}
+	});
+
+	/* preferedCompanyOne */
+	// when load
+	preferedChoiceHandling(); 
+	//when change
+	$("#preferedCompanyOne").on("change", function(){
+		preferedChoiceHandling();
+
+	});
+
+	// show Prompt before url change / reload...
+	window.onbeforeunload = function( event ) {
+		if(showPromptDialog) {
+			return "Please make sure you saved the form before leave."; 
+		}
+	};
+	// show navbar when scroll up, hide when scroll down in screen size sm/xs
+	// var lastScrollTop = 0;
+	// $( window ).scroll(function(e) {
+	// 	var st = $(this).scrollTop();
+	// 	if (st > lastScrollTop){
+	// 	   // downscroll code
+	// 	   $("nav").addClass("hidden");
+	// 	} else if(st < lastScrollTop) {
+	// 		$("nav").removeClass("hidden");
+	// 	  // upscroll code
+	// 	}
+	// 	lastScrollTop = st;
+	// });
+
+	// handle screen-xs fastlink click event
+	$(".navbar-nav li").on("click", function(e){
+		console.info(e)
+		e.preventDefault();
+		var anchor = $(this).find("a").attr("href");
+		var height = $(anchor).offset().top;
+		$('html, body').animate({ scrollTop: $(anchor).offset().top }, 'fast');//top - 50
+	});
+
+	// Form save reminder
+	// startReminderTimer();
+	// ajax renew session 
+	// var renew = setInterval(function(){renewSession()}, 60*60*1000);
+
+	//anchor collsape
+	$(".anchor").on("click", function(){
+		if(version.indexOf("MSIE 8.") != -1 ) {
+			$(this).siblings(":not(.template)").toggleClass("hidden");  // handle for IE8 response slow
+		}
+		else {
+			$(this).siblings(":not(.template)").slideToggle( 300 );
+		}
+		$(this).find(".glyphicon").toggleClass("hidden");
+	});
+	//anchor hover
+	$(".anchor").hover(function() {
+			$(this).addClass("collsape-hover");
+		}, function() {
+			$(this).removeClass("collsape-hover");
+		}
+	);
+});
+
+
+function preferedChoiceHandling() {
+	var selectedValue = $("#preferedCompanyOne").val();
+	var selectedValueTwo = $("#preferedCompanyTwo").val();
+	if( selectedValue == selectedValueTwo) {
+		$("#preferedCompanyTwo").prop("selectedIndex", -1);
+	} 
+	$("#preferedCompanyTwo option").prop("disabled", false);
+	$("#preferedCompanyTwo").find("option[value='" + selectedValue + "']").prop("disabled", true);
+}
+
+
+// setInterval for save reminder
+function startReminderTimer () {
+	timer = setInterval(function() {
+				customAlert.reminderAlert("<strong>Friendly Reminder:</strong> Please save the form periodically.");
+			}, 30*60*1000); // 30 * 60 * 1000(ms) = 30 mins
+}
+
+// reset timer for save reminder
+function resetTimer() {
+	clearInterval(timer);
+	startReminderTimer();
+}
+
+function renewSession() {
+	$.ajax({
+		type: 'POST',
+		contentType: "application/json",
+		url: appUrlRoot + "/renew_session"
+	});
+}

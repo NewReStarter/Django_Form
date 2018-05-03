@@ -42,7 +42,7 @@ class QuickFormPlugin(BaseAdminPlugin):
 class RelatedFieldWidgetWrapper(forms.Widget):
     """
     This class is a wrapper to a given widget to add the add icon for the
-    admin interface.
+    myadmin interface.
     """
 
     def __init__(self, widget, rel, add_url, rel_add_url):

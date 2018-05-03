@@ -174,7 +174,7 @@ class ListAdminView(ModelAdminView):
         self.ordering_field_columns = self.get_ordering_field_columns()
         self.paginator = self.get_paginator()
 
-        # Get the number of objects, with admin filters applied.
+        # Get the number of objects, with myadmin filters applied.
         self.result_count = self.paginator.count
 
         self.can_show_all = self.result_count <= self.list_max_show_all
@@ -253,7 +253,7 @@ class ListAdminView(ModelAdminView):
         """
         Returns the proper model field name corresponding to the given
         field_name to use for ordering. field_name may either be the name of a
-        proper model field or the name of a method (on the admin or model) or a
+        proper model field or the name of a method (on the myadmin or model) or a
         callable with the 'admin_order_field' attribute. Returns None if no
         proper model field name can be matched.
         """
@@ -275,7 +275,7 @@ class ListAdminView(ModelAdminView):
     def get_ordering(self):
         """
         Returns the list of ordering fields for the change list.
-        First we check the get_ordering() method in model admin, then we check
+        First we check the get_ordering() method in model myadmin, then we check
         the object's default ordering. Then, any manually-specified ordering
         from the query string overrides anything. Finally, a deterministic
         order is guaranteed by ensuring the primary key is used as the last
@@ -397,7 +397,7 @@ class ListAdminView(ModelAdminView):
     @filter_hook
     def get(self, request, *args, **kwargs):
         """
-        The 'change list' admin view for this model.
+        The 'change list' myadmin view for this model.
         """
         response = self.get_result_list()
         if response:

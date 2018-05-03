@@ -123,7 +123,7 @@ def prepare_lookup_value(key, value):
 
 def quote(s):
     """
-    Ensure that primary key values do not confuse the admin URLs by escaping
+    Ensure that primary key values do not confuse the myadmin URLs by escaping
     any '/', '_' and ':' characters. Similar to urllib.quote, except that the
     quoting is slightly different so that it doesn't get automatically
     unquoted by the Web browser.
@@ -164,7 +164,7 @@ def unquote(s):
 
 
 def flatten_fieldsets(fieldsets):
-    """Returns a list of field names from an admin fieldsets structure."""
+    """Returns a list of field names from an myadmin fieldsets structure."""
     field_names = []
     for name, opts in fieldsets:
         for field in opts['fields']:

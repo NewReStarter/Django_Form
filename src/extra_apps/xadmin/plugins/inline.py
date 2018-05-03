@@ -146,7 +146,7 @@ class InlineModelAdmin(ModelFormAdminView):
 
     @filter_hook
     def get_formset(self, **kwargs):
-        """Returns a BaseInlineFormSet class for use in admin add/change views."""
+        """Returns a BaseInlineFormSet class for use in myadmin add/change views."""
         if self.exclude is None:
             exclude = []
         else:

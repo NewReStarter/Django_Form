@@ -1,0 +1,659 @@
+﻿var formControl = (function () {
+
+	var init = function () {
+
+		formControl.selector = {
+			addBtn : $(".addBtn"),
+			backBtn : $(".backBtn")
+		};
+
+		_hideSummary();
+		_setOptionForSelectYear();
+
+		// savedData is json Object from server
+		if(savedData != "") {
+			_readSavedData();
+			_retrieveCV();
+		} else {
+			// clone first item for each collection from template
+			_cloneFirstItem();
+			$('select').prop('selectedIndex', -1);
+		}
+
+		// bind event
+		formControl.selector.addBtn.on("click", function(){
+			_addBtnEvent(this);
+		});
+		formControl.selector.backBtn.on("click", function(){
+			_hideSummary();
+			_showForm();
+		});
+
+		// for select .yearRangeFrom
+		$("select.yearRangeFrom").each(function() {
+			_yearRangeConditionEvent(this);
+		});
+		$("select.yearRangeFrom").on("change", function() {
+			_yearRangeConditionEvent(this);
+		});
+
+		_specifyEvent();
+		//special handle first degree datepicker binding
+		// var from = $("#tertiaryEducationFirstDegree").find(".dateForm");
+		// var to = $("#tertiaryEducationFirstDegree").find(".dateTo");
+		// _bindDatePicker(from, to);
+
+		_comboboxSelect2Event();
+		$("select.staticSelect").select2();
+		_specifyOtherEvent();
+
+
+        $(".datepicker").datepicker({
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            startView: 2,
+            viewMode: "months",
+            minViewMode: "days",
+            // startDate: defaultStartDate,
+            // endDate: now,
+            // beforeShowDay: function (date) {
+            // 	return date.valueOf() <= now.valueOf();
+            // },
+            autoclose: true
+        })
+            .on('changeDate', function (ev) {
+                // var startDateForTo = defaultStartDate;
+                // if($to.length == 1)
+                // {
+                // 	var isToDatepickerEmpty = !$to.datepicker("getDate").valueOf();
+                // 	if ( ev.date != undefined) {
+                //
+                // 		if( (ev.date.valueOf() > $to.datepicker("getDate").valueOf() || isToDatepickerEmpty ) ) {
+                // 			var newDate = new Date(ev.date);
+                // 			newDate.setDate(newDate.getDate() + 1);
+                // 			$to.datepicker("update", newDate);
+                // 		}
+                //
+                // 		startDateForTo =  ev.date ;
+                // 	}
+                // }
+            })
+            .data('datepicker');
+	};
+
+	var _specifyOtherEvent = function() {
+
+		$("select.haveOther").each(function(){
+			_setupForSelectOther(this, false);
+		});	
+		$("select.haveOther").on("change", function(){
+			_setupForSelectOther(this, true);
+		});
+
+	};
+
+	var _setupForSelectOther = function (trigger, isOnChange) {
+		var selectedValue = $(trigger).val();
+		var $inputForOther  = $(trigger).parents(".form-group").find(".inputForOther");
+		if(selectedValue == "Others") {
+			$inputForOther.show();
+			if(isOnChange) {
+				$inputForOther.find("input").addClass("compulsory").val("");
+				$inputForOther.find("input").focus();
+			} else {
+				$inputForOther.find("input").addClass("compulsory");
+			}
+		} else {
+			$inputForOther.hide().find("input").removeClass("compulsory");
+		}
+	};
+
+
+	var _comboboxSelect2Event = function(){
+
+		$("select.combobox").not(".template").each(function(){
+			var self = this;
+			$(self).select2({
+				matcher: function(term, text, opt) {
+					if(term != text) {
+						$(self).find(".combobox_other").html(term).attr("value", term).attr("disabled", false);
+					}
+					if($.trim(term) == "") {
+						$(self).find(".combobox_other").html("").attr("value", "").attr("disabled", true);
+					}
+					return  $.fn.select2.defaults.matcher.apply(this, arguments);
+				}
+			});
+		});
+
+	};
+
+	var _setOptionForSelectYear = function() {
+		var now = new Date();
+		var currentYear = now.getFullYear();
+		var maxYear = currentYear + 3;
+		var minYear = currentYear - 15;
+
+		var $tempDOM = $("<select><option value=''></option></select>");
+		for(var i = maxYear; i >= minYear; i-- ) {
+			$tempDOM
+				.append($("<option></option>")
+				.attr("value", i)
+				.text(i)); 
+		}
+		var optionDOM = $tempDOM.html();
+		$("select.yearRange").append(optionDOM);
+	};
+
+	var _yearRangeConditionEvent = function(trigger) {
+		var value = $(trigger).val();
+		var $yearRangeTo = $(trigger).parents(".form-group").find("select.yearRangeTo");
+		if( $yearRangeTo.val() != null &&  $yearRangeTo.val() != "" && $yearRangeTo.val() < value) {
+			$yearRangeTo.prop('selectedIndex', -1);
+		}
+		var options = $yearRangeTo.find("option");
+		$(options).attr("disabled", false);
+		options.each(function() {
+			if( value > $(this).val() ) {
+				$(this).attr("disabled", true);
+			}
+		});
+	};
+
+	var _specifyEvent = function() {
+	
+		// For questionnaire each input.hasSpecific
+		$("input.hasSpecific").each(function() {
+			_inputHasSpecify(this);
+		});
+		// For questionnaire onchange event
+		$("input.hasSpecific").on("change", function() {
+			_inputHasSpecify(this);
+		});
+
+		// For Recruitment Sources each checkbox init
+		$("#recruitment_sources input:text").attr("disabled", true);
+		$("#recruitment_sources input:checkbox.hasSpecific").each(function(){
+			if( $(this).prop("checked") ) {
+				$(this).parents(".parentDiv").next().find(".specifyInputBox").addClass("compulsory").attr("disabled", false);
+                $(this).parents(".parentDiv").next().find(".specifyInputBox").removeClass("hidden");
+			} else {
+				$(this).parents(".parentDiv").next().find(".specifyInputBox").removeClass("compulsory").attr("disabled", true).val("");
+                $(this).parents(".parentDiv").next().find(".specifyInputBox").addClass("hidden");
+			}
+		});
+
+		// For Recruitment Sources onchange event
+		$("#recruitment_sources input:checkbox.hasSpecific").on("change", function(){
+			if($(this).prop("checked")) {
+				$(this).parents(".parentDiv").next().find(".specifyInputBox").addClass("compulsory").attr("disabled", false);
+                $(this).parents(".parentDiv").next().find(".specifyInputBox").removeClass("hidden");
+			} else {
+				$(this).parents(".parentDiv").next().find(".specifyInputBox").removeClass("compulsory").attr("disabled", true).val("");
+                $(this).parents(".parentDiv").next().find(".specifyInputBox").addClass("hidden");
+			}
+		});
+		
+	};
+
+	var _inputHasSpecify = function(trigger) {
+		var $formGroup = $(trigger).closest(".form-group");
+		var type = $(trigger).prop("type");
+		var name = $(trigger).prop("name");
+		var radioValue = $("[name="+name+"]:checked").val();
+		var checked = $(trigger).prop("checked");
+		if ( type === "radio" && radioValue === "yes" || type === "checkbox" && checked){
+			$formGroup.find(".specifyTextarea").addClass("compulsory");
+			$formGroup.find("select").addClass("compulsory");
+			$formGroup.find(".specifyTextareaDiv").show();
+		} else {
+			$formGroup.find(".specifyTextarea").removeClass("compulsory").val("");
+			$formGroup.find("select").removeClass("compulsory").select2('data', null).trigger("change");
+			$formGroup.find(".specifyTextareaDiv").hide();
+		}
+	};
+
+	var _readSavedData = function() {
+		//read json data 
+		$.each(savedData, function(parentKey, object) {
+			
+			var id = "#" + parentKey;
+			//no need to handle  resume in here
+			if(parentKey == "resume") {
+				return;
+			}
+			if(object.length == undefined ) {
+				if($(id).hasClass("collection")) {
+					_addBtnEvent(id);
+				}
+				$.each(object, function(key, value) {
+					// handle radio 
+					if($('input[name="'+ key + '"]').is(":radio")) {
+						$('input[name="'+ key + '"]').each(function(){
+							if($(this).attr("value") == value) {
+								$(this).prop( "checked", true );
+							}
+						});
+					} else if($('input[name="'+ key + '"]').is(":checkbox")) {
+						$('input[name="'+ key + '"]').each(function(){
+							var self = this;
+							if(typeof value == "object"){
+								$.each(value, function(index, subValue){
+									if($(self).attr("value") == subValue) {
+										$(self).prop( "checked", true );
+									}
+								});
+							} else {
+								if($(this).attr("value") == value) {
+									$(this).prop( "checked", true );
+								}
+							}
+							
+						});
+					} else {
+						
+						$('input[name="'+ key + '"]').not('.template').val(value); // text 
+						//$('input[name="'+ key + '"].datepicker').not('.template').datepicker('update', value); // datepicker 
+					}
+					$('select[name="'+ key + '"]').not('.template').val(value);
+					$('select[name="'+ key + '"]').not('.template').select2("val", value);
+					$('textarea[name="'+ key + '"]').not('.template').val(value);
+				});
+			} else {
+				for(var i = 0 ; i < object.length; i++ ) {
+					if($(id).hasClass("collection")) {
+						var isLanguage = (parentKey == "written_language" || parentKey == "spoken_language");
+						var isCompulsory = (i<2); // if isLanguage, 2 subjects are conpulsory
+
+						if(!isLanguage || !isCompulsory) {
+							_addBtnEvent(id);
+						} 
+						$.each(object[i], function(key, value) {
+							//display the key and value pair
+							var $input = $($('input[name="'+ key + '"]').not('.template').get(i));
+							var $select = $($('select[name="'+ key + '"]').not('.template').get(i));
+							var $select2 = $($('select[name="'+ key + '"]').not('.template').get(i));
+							var $textarea = $($('textarea[name="'+ key + '"]').not('.template').get(i));
+							$input.val(value);
+							$select.val(value);
+							$select2.select2("val", value);
+							$textarea.val(value);
+
+							// if(key === "gap_year_nature_of_experience" || key === "spoken_language"){
+							// 	console.log("i=" + i);
+							// 	console.log(key+": "+value);
+							// 	console.log($select);
+							// 	console.log($select.val());
+							// 	// console.log($('input[name="'+ key + '"]').not('.template'));
+							// }
+
+							if(key == "written_language" || key == "spoken_language" || key == "gap_year_nature_of_experience") {
+								try {
+									var isExists = $select.find("option[value='" + value + "']").length !== 0;
+								}catch(err){
+									console.log('some language has apostrophe');
+								}
+								if(!isExists) {
+									$select.find(".combobox_other").html(value).attr("value", value).attr("disabled", false);
+									$select.val(value);
+									$select2.select2("val", value);
+								}
+							}
+							//$($('input[name="'+ key + '"].datepicker').not('.template').get(i)).datepicker('update', value); // datepicker
+						});
+					}
+				}
+			}
+		});
+		// if no record exists, add a record
+		_cloneFirstItem();
+	};
+
+	var _retrieveCV = function() {
+		// resumeInfo is json Object from server
+		if(resumeInfo != "" && resumeInfo.resume_has_saved  == true) {
+			$("#cv_name").text(resumeInfo.display_file_name);
+			$("#download_CV").removeClass("hidden");
+		}
+	};
+
+	var _cloneFirstItem = function() {
+
+		$(".formCategory").each(function(){
+			var id = "#" + $(this).find(".collection.template").attr("id");
+			// var isLanguage = (id == "#spoken_language" || id == "#written_language");
+            var isLanguage = (id == "#language");
+			var $collectionDom = $(this).find(".collection:not(.template)")
+
+			if((isLanguage && $collectionDom.get(2) == undefined) || $collectionDom.get(0) == undefined){
+				console.log('_addBtnEvent for ',id);
+				_addBtnEvent(id);
+			}
+			var firstCollection = $(this).find(".collection:not(.template) .removeBtn").not(".template").get(0);
+			$(firstCollection).addClass("hidden");
+		});
+	};
+
+	var _cloneCollectionWithoutPlugIn = function(trigger) {
+		var $category = $(trigger).parents(".formCategory");
+		var $collection = $category.find(".template.collection").clone(true);
+		_cloneGeneralElement($category, $collection);
+	};
+
+	// cloning general form element and bind remove record button
+	var _cloneGeneralElement = function($category, $collection) {
+		$collection.removeAttr( "id" );
+		//show the index of collection (no need to +1 because template collection exists) 
+		var index = $category.find(".collection").length;
+		$collection.find(".recordIndex").text(index);
+		if (index == 1) {
+			$collection.addClass("firstCollection");
+		}
+		// bind bootstrap popover event
+		$collection.find(".removeBtn").removeClass("hidden").popover({html: true});
+		// bind remove event
+		$collection.on( "click", ".confirmRemoveItemBtn", function() {
+			_removeBtnEvent(this);
+		});
+
+		// bind cancel remove event
+		$collection.on( "click", ".cancelRemoveItemBtn", function() {
+			$collection.find(".popoverBtn").popover('hide');
+		});
+
+		// $collection.find("select").prop('selectedIndex', -1);
+		$collection.find("select").val('');
+
+		$collection.find(".template").removeClass("template");
+		var lastElement = $category.find(".addBtnDiv")[0];
+		$collection.removeClass("template hidden").addClass("clone").insertBefore($(lastElement));
+
+	};
+
+	var _cloneCollectionWithPlugIn = function(trigger) {
+		var $category = $(trigger).parents(".formCategory");
+		var $collection = $category.find(".template.collection").clone(true);
+
+		// bind datepicker event
+		var $from = $collection.find(".dateForm");
+		var $to = $collection.find(".dateTo");
+		_bindDatePicker($from, $to);
+		// bind select2 event
+		$collection.find("select.enableSelect2").select2();
+
+		$collection.find("select.combobox").select2({
+			matcher: function(term, text, opt) {
+				if(term != text) {
+					$collection.find(".combobox_other").html(term).attr("value", term).attr("disabled", false);
+				}
+				if($.trim(term) == "") {
+					$collection.find(".combobox_other").html("").attr("value", "").attr("disabled", true);
+				}
+				return  $.fn.select2.defaults.matcher.apply(this, arguments);
+			}
+		});
+
+		$collection.find("select.haveOther").select2({
+		// $collection.find("select[name='university_of_tertiary_education']").select2({
+			matcher: function(term, text, opt) {
+				var terms = term.split(" ");
+		        for (var i=0; i < terms.length; i++){
+		            var tester = new RegExp("\\b" + terms[i], 'i');
+		            if (tester.test(text) == false){
+		                return (text === 'Others');
+		            }
+		        }
+				return $.fn.select2.defaults.matcher.apply(this, arguments);
+			},
+	    	sortResults: function(results, container, query) {
+	    		// sort function
+	            return results.sort(function (a, b) {
+					return a.text.localeCompare(b.text);
+				});
+		    }
+		});
+
+		//bind maxLength event
+		$collection.find(".maxWordInput").maxlength({
+			alwaysShow: true,
+			validate: false
+		});
+		_cloneGeneralElement($category, $collection);
+	};
+
+	//start date must before or equal today, end date must after start date
+	var _bindDatePicker = function($from, $to) {
+		//datepicker
+		var nowTemp = new Date();
+		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+		var defaultStartDate = "01-1950";
+		 
+		var startDate = $from.datepicker({
+			// todayHighlight: true,
+			format: "yyyy-mm",
+			startView: 2,
+    		viewMode: "months", 
+    		minViewMode: "months",
+    		startDate: defaultStartDate,
+    		endDate: now,
+			beforeShowDay: function (date) {
+				return date.valueOf() <= now.valueOf();
+			},
+			autoclose: true
+		})
+		.on('changeDate', function(ev) {
+			var startDateForTo = defaultStartDate;
+			if($to.length == 1)
+			{
+				var isToDatepickerEmpty = !$to.datepicker("getDate").valueOf();
+				if ( ev.date != undefined) {
+
+					if( (ev.date.valueOf() > $to.datepicker("getDate").valueOf() || isToDatepickerEmpty ) ) {
+						var newDate = new Date(ev.date);
+						newDate.setDate(newDate.getDate() + 1);
+						$to.datepicker("update", newDate);
+					}
+
+					startDateForTo =  ev.date ;
+				}
+				$to.datepicker("setStartDate", startDateForTo );
+				$to.find("input")[0].focus();
+			}
+		})
+		.data('datepicker');
+
+		var endDate = $to.datepicker({
+			format: "yyyy-mm",
+			startView: 2,
+    		viewMode: "months", 
+    		startDate: defaultStartDate,
+    		minViewMode: "months",		
+			beforeShowDay: function (date) {
+				if ($from.datepicker("getDate").valueOf()) {
+					return date.valueOf() > $from.datepicker("getDate").valueOf();
+				} else {
+				}
+			},
+			autoclose: true
+		}).on('changeDate', function(ev) {
+
+            console.log('$to dp',$to.find('.datepicker'));
+            if($from.length == 1 && $to.length == 1)
+            {
+                var duration = $to.datepicker("getDate").valueOf() - $from.datepicker("getDate").valueOf();
+                var days = Math.ceil(duration/(24*3600000));
+                var years = Math.floor(days/365.25);
+                var remainMonths = Math.ceil((days%365.25)/(365.25/12));
+                console.log('$to dp',$to.find('.datepicker'));
+                console.log('$to dp name',$to.find('.datepicker').attr('name'));
+                var baseName = $to.find('.datepicker').attr('name').replace('_to','_');
+                var parent = $to.closest('.collection');
+                parent.find("input[name='"+baseName+"years"+"']").val(years);
+                parent.find("input[name='"+baseName+"months"+"']").val(remainMonths);
+            }
+        }).data('datepicker');
+
+	};
+
+	var _addBtnEvent = function(trigger) {
+		var type = $(trigger).parents(".formCategory").attr("id");
+        console.log('_addBtnEvent trigger',$(trigger));
+        console.log('_addBtnEvent trigger parents',$(trigger).parents(".formCategory"));
+		console.log('_addBtnEvent type',type);
+			switch(type) {
+				case "relevantWorkingExperienceCategory":
+				case "nationalServiceCategory":
+				case "overseasExchangeProgrammeExperience":
+				case "GAPYear":
+				case "otherOverseasExperience":
+				case "tertiaryEducation":
+				case "secondaryEducation":
+				case "ctgActivities":
+                case "ctgLanguage":
+				// case "written":
+				// case "spoken":
+					_cloneCollectionWithPlugIn(trigger);
+					break;
+				default:
+					_cloneCollectionWithoutPlugIn(trigger);
+                    console.log('_addBtnEvent default');
+					break;
+			}
+	};
+
+	var _removeBtnEvent = function(trigger) {
+		var $category = $(trigger).parents(".formCategory");
+		$(trigger).parents(".collection").remove();
+		// update record index
+		$category.find(".recordIndex").each(function(index){
+			$(this).text(index);
+		});
+	};
+
+	var parseToJsonStr = function() {
+		//parse form data to json
+		var saveData = {};
+		//parentKey for json the primary key
+		$(".parentKey").not('.template').each(function(){
+
+			var key = $(this).attr("key");
+            console.log('parseToJsonStr this '+key, $(this));
+			var newObject = $(this).serializeObject();
+			console.log('parseToJsonStr newObj '+key, newObject);
+
+			if($(this).hasClass("collection")) {
+
+				if (saveData[key]  === undefined) {
+					saveData[key] = [];
+				}
+				if( !utilities.isEmptyObject(newObject) ) {
+					saveData[key].push(newObject);
+				}
+
+			} else {
+				saveData[key] = newObject;
+			}
+		});
+
+		if(isSelectedFile) {
+			var object = {};
+
+			object["resume_has_saved"] = true;
+			object["display_file_name"] = $("#fileName").text();
+			saveData["cv_upload"] = object ; 
+		} else {
+			saveData["cv_upload"] = resumeInfo ; 
+		}
+		// //process gap year
+		// var tempWorkExp;
+        // tempWorkExp = saveData['working_exp'].filter(function(we){
+        	// return we.type != 'Gap year';
+		// });
+        // var tempGap = saveData['working_exp'].filter(function(we){
+         //    return we.type == 'Gap year';
+        // });
+        // saveData['working_exp'] = tempWorkExp;
+        // //transform new gap to original gap
+        // saveData['gap_year'] = [];
+        // tempGap.forEach(function(gap){
+         //    // {
+         //    //     "employer_name":"s",
+         //    //     "working_country":"Åland Islands",
+         //    //     "type":"Gap year",
+         //    //     "position_held":"gappist",
+         //    //     "duration_from":"2015-07",
+         //    //     "duration_to":"2019-11",
+         //    //     "duration_years":"4",
+         //    //     "duration_months":"13"
+         //    // }
+         //    // {
+         //    //     "gap_year_country":"Algeria",
+         //    //     "gap_year_duration_from":"2014-06",
+         //    //     "gap_year_duration_to":"2014-07",
+         //    //     "gap_year_duration_years":"1",
+         //    //     "gap_year_duration_months":"1",
+         //    //     "gap_year_nature_of_experience":"Social Travel",
+         //    //     "gap_year_description":"yoyoyo"
+         //    // }
+        	// oGap = {};
+         //    oGap.gap_year_country = gap.working_country;
+         //    oGap.gap_year_duration_from = gap.duration_from;
+         //    oGap.gap_year_duration_to = gap.duration_to;
+         //    oGap.gap_year_duration_years = gap.duration_years;
+         //    oGap.gap_year_duration_months = gap.duration_months;
+         //    oGap.gap_year_nature_of_experience = '';
+         //    oGap.gap_year_description = gap.position_held;
+         //    saveData['gap_year'].push(oGap);
+		// });
+		//add dummy old version fields to saveData
+        saveData['gap_year'] = [];
+		saveData['spoken_language'] = [];
+		saveData['written_language'] = [];
+        saveData['activities_at_university'] = [];
+        saveData['activities_at_secondary_school'] = [];
+		saveData['national_service'] = [];
+        saveData['overseas_exchange_programme_experience'] = [];
+        saveData['other_overseas_experience'] = [];
+
+		return utilities.strRemoveHTMLtags(JSON.stringify(saveData));
+	};
+
+	/* Form Summary */
+	var _hideForm = function() {
+		$(".form-container").hide();
+		$("#navigationBar").addClass("hidden").hide();
+	};
+
+	var _showForm = function() {
+		$(".form-container").show();
+		$("#navigationBar").removeClass("hidden").show();
+	};
+
+	var _hideSummary = function () {
+		$("#summaryDiv").find("#formSummary").remove();
+		$("#summaryDiv").hide();
+	};
+
+	var updateAndShowSummary = function() {
+		var data = $.parseJSON(parseToJsonStr());
+		jsonToInfoPresenter.clear();
+		jsonToInfoPresenter.init(data);
+		_hideForm();
+		$("#summaryDiv").show();	
+		$('html, body').animate({ scrollTop: $('#summaryDiv').offset().top-50 }, 'fast');
+	};
+
+	var hideSummaryAndShowForm = function() {
+		_hideSummary();
+		_showForm();
+	}
+	
+	// return public method
+	return {
+		init: init,
+		parseToJsonStr: parseToJsonStr,
+		updateAndShowSummary : updateAndShowSummary,
+		hideSummaryAndShowForm : hideSummaryAndShowForm
+	};
+
+})();

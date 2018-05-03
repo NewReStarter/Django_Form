@@ -75,7 +75,7 @@ class CommentsAdmin(object):
 
     def _bulk_flag(self, queryset, action, done_message):
         """
-        Flag, approve, or remove some comments from an admin action. Actually
+        Flag, approve, or remove some comments from an myadmin action. Actually
         calls the `action` argument to perform the heavy lifting.
         """
         n_comments = 0
@@ -88,7 +88,7 @@ class CommentsAdmin(object):
                         n_comments)
         self.message_user(msg % {'count': n_comments, 'action': done_message(n_comments)}, 'success')
 
-# Only register the default admin if the model is the built-in comment model
+# Only register the default myadmin if the model is the built-in comment model
 # (this won't be true if there's a custom comment app).
 if 'django.contrib.comments' in settings.INSTALLED_APPS and (get_model() is Comment):
     xadmin.site.register(Comment, CommentsAdmin)

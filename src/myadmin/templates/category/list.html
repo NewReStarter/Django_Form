@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>团队管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/bootstrap-4.0.0-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/bootstrap-table/bootstrap-table.css">
+    <script src="/static/jquery.min.js"></script>
+    <script src="/static/bootstrap-4.0.0-dist/js/bootstrap.js"></script>
+    <script src="/static/bootstrap-table/bootstrap-table.js"></script>
+    <script src="/static/bootstrap-table/locale/bootstrap-table-en-US.js"></script>
+    <script src="/static/layui/layui.all.js"></script>
+    <style>
+        #toolbar {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar" class="btn-group">
+    <button type="button" class="btn btn-default" id="questionDetail">Check Questions</button>
+</div>
+<table id="table"></table>
+<script type="text/javascript">
+    var layer = layui.layer;
+    $('#table').bootstrapTable({
+        url: '/myadmin/category/GetList',
+        method: 'post',
+        pagination: true,
+        paginationLoop: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        singleSelect: true,
+        idField: 'id',
+        search: true,
+        searchAlign: 'right',
+        sortName: 'id',
+        sortOrder: 'desc',
+        paginationPreText: 'Previous Page',
+        paginationNextText: 'Next Page',
+        clickToSelect: true,
+        toolbar: '#toolbar',
+        toolbarAlign: 'left',
+        smartDisplay: true,
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        columns: [
+            {checkbox: true},
+            {field: 'text', title: 'Name'},
+            {field: 'create_time', title: 'time of created'},
+            {field: 'modify_time', title: 'time of modified'},
+            {
+                field: 'status', title: 'Display or Not', formatter: function (val, row) {
+                    switch (val) {
+                        case 0:
+                            return '<span class="layui-bg-green">No</span>';
+                            break;
+                        case 1:
+                            return '<span class="layui-bg-red">Yes</span>';
+                            break;
+                        default:
+                            return '<span class="layui-bg-red">Error</span>';
+                            break;
+                    }
+                }
+            },
+        ],
+        ajaxOptions: {
+            headers: {"X-CSRFToken": '{{ token }}'}
+        },
+        formatSearch: function () {
+            return 'Name';
+        },
+        queryParams: function (params) {
+            params.csrfmiddlewaretoken = '{{ token }}';
+            return params;
+        }
+    })
+    $('#questionDetail').click(function () {
+        var rows = $('#table').bootstrapTable('getSelections');
+        if (rows.length == 0)
+            layer.msg('Please Select one Line')
+        else
+            layer.open({
+                type: 2,
+                title: 'Question',
+                area: ['80%', '100%'],
+                content: '/myadmin/question/list?id=' + rows[0].id,
+            })
+    })
+</script>
+</body>
+</html>

@@ -1252,10 +1252,10 @@ msgstr "Seleccionar diferentes versiones"
 #: templates/xadmin/views/model_history.html:58
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+"myadmin site."
 msgstr ""
 "Este objeto no tiene un historial de cambios, Es probable  que no se haya "
-"añadido a través de este sitio de admin.|"
+"añadido a través de este sitio de myadmin.|"
 
 #: templates/xadmin/views/model_list.html:29
 #, python-format

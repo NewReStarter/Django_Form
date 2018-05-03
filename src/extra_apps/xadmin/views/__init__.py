@@ -19,7 +19,7 @@ __all__ = (
     'filter_hook', 'csrf_protect_m'
 )
 
-# admin site-wide views
+# myadmin site-wide views
 
 
 def register_builtin_views(site):

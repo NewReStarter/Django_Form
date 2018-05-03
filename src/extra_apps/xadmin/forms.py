@@ -13,7 +13,7 @@ ERROR_MESSAGE = ugettext_lazy("Please enter the correct username and password "
 
 class AdminAuthenticationForm(AuthenticationForm):
     """
-    A custom authentication form used in the admin app.
+    A custom authentication form used in the myadmin app.
 
     """
     this_is_the_login_form = forms.BooleanField(

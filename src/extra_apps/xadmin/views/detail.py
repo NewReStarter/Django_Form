@@ -184,7 +184,7 @@ class DetailAdminView(ModelAdminView):
     @filter_hook
     def get_model_form(self, **kwargs):
         """
-        Returns a Form class for use in the admin add view. This is used by
+        Returns a Form class for use in the myadmin add view. This is used by
         add_view and change_view.
         """
         if self.exclude is None:

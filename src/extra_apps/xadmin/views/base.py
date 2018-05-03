@@ -523,9 +523,9 @@ class ModelAdminView(CommAdminView):
     @filter_hook
     def get_object(self, object_id):
         """
-        Get model object instance by object_id, used for change admin view
+        Get model object instance by object_id, used for change myadmin view
         """
-        # first get base admin view property queryset, return default model queryset
+        # first get base myadmin view property queryset, return default model queryset
         queryset = self.queryset()
         model = queryset.model
         try:
@@ -580,7 +580,7 @@ class ModelAdminView(CommAdminView):
     def queryset(self):
         """
         Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
+        myadmin site. This is used by changelist_view.
         """
         return self.model._default_manager.get_queryset()
 

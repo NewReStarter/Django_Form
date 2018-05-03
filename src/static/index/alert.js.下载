@@ -1,0 +1,78 @@
+﻿var customAlert = (function () {
+
+	// var alertLength = 0;
+	// var alertLimit = 5;
+	var showTime = 10000; //ms
+	var fadeTime = 300; //ms
+	var alertData = {
+		"alert-type" : ["alert-success","alert-info","alert-warning","alert-danger"],
+		"fa-icon" : ["fa-check-circle","fa-info-circle","fa-exclamation-triangle","fa-times-circle"]
+	};
+
+	var init = function () {
+		var mainDiv = $("<div></div>").attr("id","FeedbackDiv");
+		// create dom element for custsom alert
+		for (var i = 0; i < alertData["alert-type"].length; i++) {
+			var alert = $("<div></div>").attr("role","alert").addClass("alert alert-dismissible template hidden " + alertData["alert-type"][i]);
+			var buttonTag = $("<button></button>").attr("type","button").attr("data-dismiss","alert").addClass("close").html('<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>');
+			var iTag = $("<i></i>").addClass("fa fa-lg " + alertData["fa-icon"][i]);
+			var spanTag = $("<span></span>").addClass("alertMessage");
+			$(alert).append(buttonTag).append(iTag).append(" ").append(spanTag);
+			$(mainDiv).append(alert);
+		}
+
+		$("body").append(mainDiv);
+		customAlert.selector = {
+			alertDiv: $("#FeedbackDiv"),
+			successAlert: $("#FeedbackDiv .alert.alert-success.template"),
+			infoAlert : $("#FeedbackDiv .alert.alert-info.template"),
+			warningAlert: $("#FeedbackDiv .alert.alert-warning.template"),
+			errorAlert : $("#FeedbackDiv .alert.alert-danger.template")
+		}
+	};
+	var successAlert = function (message) {
+		var alert = customAlert.selector.successAlert.clone(true);
+		_showAlert(alert, message);
+	};
+	var infoAlert = function (message) {
+		var alert = customAlert.selector.infoAlert.clone(true);
+		_showAlert(alert, message);
+	};
+	var warningAlert = function(message) {
+		var alert = customAlert.selector.warningAlert.clone(true);
+		_showAlert(alert, message);
+	};
+	var errorAlert = function (message) {
+		var alert = customAlert.selector.errorAlert.clone(true);
+		_showAlert(alert, message);
+	};
+	var _showAlert = function(alert, message) {
+		_clearAlertAndPrepareNew(alert, message);
+		alert.fadeOut(1).fadeIn(fadeTime).delay(showTime).fadeOut(fadeTime, _removeAlert);
+	};
+	var _removeAlert = function() {
+		$(this).remove();
+	};
+	var reminderAlert = function(message) {
+		var alert = customAlert.selector.infoAlert.clone(true);
+		_clearAlertAndPrepareNew(alert, message);
+		alert.fadeOut(1).fadeIn(fadeTime).show();
+	};
+	var _clearAlertAndPrepareNew = function(alert, message) {
+
+		$("#FeedbackDiv .alert").not(".template").remove();
+		alert.removeClass("template");
+		alert.appendTo(customAlert.selector.alertDiv);
+		alert.find(".alertMessage").html(message);
+		alert.removeClass("hidden");
+	}
+
+	return {
+		init: init,
+		successAlert : successAlert,
+		infoAlert : infoAlert,
+		errorAlert: errorAlert,
+		reminderAlert: reminderAlert
+	};
+
+})();

@@ -1,124 +1,228 @@
 <!DOCTYPE html>
+<!-- saved from url=(0085)#declaration_anchor -->
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>Generic Form</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <title>index</title>
+    <link rel="icon" type="image/ico" href="https://devcloudaws.ehrdesign.com/lawrence/jtsummer/images/logo_ico.ico">
+    <link href="/static/index/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/select2.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/select2-bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/datepicker3.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/jquery.fileupload.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/theme.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/main.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/alert.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/application_summary.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/print.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/notosanssc.css" rel="stylesheet" type="text/css">
+    <link href="/static/layui/css/layui.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+		  <script src="/lawrence/jtsummer/lib/html5shiv.min.js"></script>
+		  <script src="/lawrence/jtsummer/lib/respond.min.js"></script>
+		<![endif]-->
+
+    <script type="text/javascript" src="/static/index/jquery-1.11.1.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap-maxlength.js.下载"></script>
+    <script type="text/javascript" src="/static/index/select2.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap-datepicker.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.ui.widget.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.iframe-transport.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.fileupload.js.下载"></script>
+
+    <script type="text/javascript" src="/static/index/mdn.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form_control.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form_validator.js.下载"></script>
+    <script type="text/javascript" src="/static/index/alert.js.下载"></script>
+    <script type="text/javascript" src="/static/index/validator.js.下载"></script>
+    <script type="text/javascript" src="/static/index/utilities.js.下载"></script>
+    <script type="text/javascript" src="/static/index/application_summary.js.下载"></script>
+    <script>
+        var appUrlRoot = '/lawrence/jtsummer/index.cfm';
+        var savedData = "";
+        var resumeInfo = "";
+    </script>
 </head>
 
+<body data-spy="scroll" data-target="#scrollspy">
 
-<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+<!-- Fixed navbar -->
+<nav class="hidden-print navbar navbar-default navbar-fixed-top visible-sm visible-xs" role="navigation"
+     id="navigationBar">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">Form Data</a>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse" style="height: 1px;">
+        <ul class="nav navbar-nav">
+            {% for c in categories %}
+                <li>
+                    <a href="#collapse{{ c.id }}">
+                        <i class="fa fa-exclamation hidden"></i> {{ c.text }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <!--/.nav-collapse -->
+</nav>
 
 
-<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
-
-
-<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
-
-
-<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-
-
-<form enctype='application/json' method="post" action="{% url 'form_data' %}" id="main">
-    <div class="panel-group" id="topaccordion" role="tablist" aria-multiselectable="true">
-        {% for c in categories %}
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="heading{{ c.id }}">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#topaccordion" href="#collapse{{ c.id }}"
-                           aria-expanded="false" aria-controls="collapse{{ c.id }}">
+<div class="container">
+    <div class="header hidden-md hidden-lg hidden-print">
+    </div>
+    <div class="form-container">
+        <div class="hidden-print col-md-2 hidden-xs hidden-sm" id="scrollspy" style="margin-top: 50px">
+            <ul class="nav sub-nav-tabs nav-stacked affix-top" id="sub-nav">
+                {% for c in categories %}
+                    <li>
+                        <a href="#collapse{{ c.id }}">
+                            <i class="fa fa-exclamation hidden"></i> {{ c.text }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-10 col-sm-12">
+            <form class="form-horizontal" role="form" id="applicationForm" action="" method="post" translate="yes"
+                  style="margin-top: 50px">
+                {% for c in categories %}
+                    <div class="parentKey anchorDiv" key="collapse">
+                        <p class="anchor legend" id="collapse{{ c.id }}">
                             {{ c.text }}
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapse{{ c.id }}" class="panel-collapse collapse" role="tabpanel"
-                     aria-labelledby="heading{{ c.id }}">
-                    <div class="panel-body">
-                        <div class="panel-group" id="accordion{{ c.id }}" role="tablist" aria-multiselectable="true">
-                            {% for q in c.question_set.all %}
-                                <div class="panel-heading" role="tab" id="question_heading{{ q.id }}">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion{{ c.id }}"
-                                           href="#question_collapse{{ q.id }}"
-                                           aria-expanded="false" aria-controls="question_collapse{{ q.id }}">
-                                            {{ q.title }}
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="question_collapse{{ q.id }}" class="panel-collapse collapse in" role="tabpanel"
-                                     aria-labelledby="question_heading{{ q.id }}">
-                                    <div class="panel-body">
-                                        {% if q.type == 'textarea' %}
-                                            <textarea class="form-control" name="{{ q.title }}{{ q.id }}" value=""
-                                                      rows="3"></textarea>
-                                        {% elif q.type == 'radio' %}
-                                            <fieldset class="form-group">
-                                                {% for o in q.option_set.all %}
-                                                    <div class="form-check">
-                                                        <label class="form-check-label">
-                                                            <input type="radio" class="form-check-input"
-                                                                   name="{{ q.title }}{{ q.id }}"
-                                                                   id="{{ o.text }}{{ o.id }}"
+                        </p>
+                        {% for q in c.question_set.all %}
+                            <div class="form-group" style="display: none;margin-left: 30px;">
+                                <label class="control-label">
+                                    {{ q.title }}    {% if q.describe != '' %}( {{ q.describe|default:'' }} ) {% endif %}
+                                </label>
+                                <div>
+                                    {% if q.type == 'textarea' %}
+                                        <textarea class="form-control formElement maxWordInput"
+                                                  name="{{ c.id }}_{{ q.id }}" placeholder="" rows="5"
+                                                  {% if q.require %}required{% endif %}
+                                                  maxword="200"></textarea>
+                                    {% elif q.type == 'radio' %}
+                                        <div class="col-xs-12">
+                                            {% for o in q.option_set.all %}
+                                                <div class="col-md-1 col-sm-1 col-xs-2">
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio"
+                                                                   class="formElement compulsory hasSpecific"
+
+                                                                   name="{{ c.id }}_{{ q.id }}"
                                                                    value="{{ o.text }}"
-                                                            >
-                                                            {{ o.text }}
+                                                                   {% if q.require %}required{% endif %}>{{ o.text }}
                                                         </label>
                                                     </div>
-                                                {% endfor %}
-                                            </fieldset>
-                                        {% elif q.type == 'checkbox' %}
-                                            <div class="form-check">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input"
-                                                           name="{{ q.title }}{{ q.id }}"
-                                                    >
-                                                    {{ q.describe }}
-                                                </label>
-                                            </div>
-                                        {% elif q.type == 'select' %}
-                                            <div class="form-group">
-                                                <select class="form-control" name="{{ q.title }}{{ q.id }}"
-                                                        id="{{ q.title }}{{ q.id }}">
-                                                    {% for o in q.option_set.all %}
-                                                        <option>{{ o.text }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        {% elif q.type == "multiple_select" %}
-                                            <div class="form-group">
-                                                <select multiple class="form-control" name="{{ q.title }}{{ q.id }}"
-                                                        id="{{ q.title }}{{ q.id }}">
-                                                    {% for o in q.option_set.all %}
-                                                        <option>{{ o.text }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                        {% else %}
-                                            <div class="form-group row">
-                                                <label for="example-text-input"
-                                                       class="col-2 col-form-label">{{ q.type }}:</label>
-                                                <div class="col-10">
-                                                    <input class="form-control" type="{{ q.type }}" width="{{q.length}}" value=""
-                                                           name="{{ q.title }}{{ q.id }}" form="main">
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% elif q.type == 'checkbox' %}
+                                        {% for o in q.option_set.all %}
+                                            <div class="col-xs-12">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input class="formElement compulsory"
+                                                               type="checkbox"
+                                                               name="{{ c.id }}_{{ q.id }}"
+                                                               {% if q.require %}required{% endif %}
+                                                               value="{{ o.text }}">{{ o.text }}
+                                                    </label>
                                                 </div>
                                             </div>
-                                        {% endif %}
-
-
-                                    </div>
+                                        {% endfor %}
+                                    {% elif q.type == 'select' %}
+                                        <select class="form-control formElement compulsory"
+                                                {% if q.require %}required{% endif %}
+                                                name="{{ c.id }}_{{ q.id }}">
+                                            {% for o in q.option_set.all %}
+                                                <option>{{ o.text }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% elif q.type == "multiple_select" %}
+                                        <select multiple
+                                                class="form-control formElement compulsory"
+                                                name="{{ c.id }}_{{ q.id }}"
+                                                {% if q.require %}required{% endif %}
+                                        >
+                                            {% for o in q.option_set.all %}
+                                                <option>{{ o.text }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% elif q.type == "date" %}
+                                        <div class="input-group date dateOfBirth">
+                                            <input type="text"
+                                                   class="form-control compulsory datepicker
+                                                          "
+                                                   name="{{ c.id }}_{{ q.id }}" placeholder="Year-Month-Day"
+                                                   {% if q.require %}required{% endif %}
+                                                   readonly>
+                                        </div>
+                                    {% else %}
+                                        <input type="{{ q.type }}"
+                                               class="form-control email formElement compulsory"
+                                               name="{{ c.id }}_{{ q.id }}"
+                                               size="{{q.length}}"
+                                               {% if q.require %}required{% endif %}
+                                               placeholder="">
+                                    {% endif %}
                                 </div>
-                            {% endfor %}
-                        </div>
+                                {% if q.allow_multiple %}
+                                    <button type="button" class="btn btn-primary addBtn">add</button>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     </div>
+                {% endfor %}
+                <div class=" text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-            </div>
-        {% endfor %}
+            </form>
+        </div>
     </div>
-</form>
-
-
-<div class="btn-group" role="group" aria-label="...">
-    <button type="submit" class="btn btn-default" tabindex="3" form="main">submit</button>
-
-    <button type="button" class="btn btn-default">Export PDF</button>
 </div>
-
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span>
+<script>
+    $('.addBtn').click(function () {
+        {#console.info($(this).siblings('div').find('input')[0]);#}
+        var name = $(this).siblings('div').find('input')[0].attributes[2].value;
+        $(this).siblings('div').append($(this).siblings('div').find('input')[0].outerHTML)
+        var thisChild = $(this).siblings('div').find('input')[$(this).siblings('div').find('input').length - 1];
+        thisChild.attributes[2].value = name + '_' + ($(this).siblings('div').children().length - 1);
+        bind();
+    })
+    function bind() {
+        $(".datepicker").datepicker({
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            startView: 2,
+            viewMode: "months",
+            minViewMode: "days",
+            autoclose: true
+        })
+            .data('datepicker');
+    }
+</script>
+</body>
+</html>

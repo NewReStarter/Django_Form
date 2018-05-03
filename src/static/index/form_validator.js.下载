@@ -1,0 +1,524 @@
+﻿var formValidator = (function () {
+
+	// var isDebugging = true;
+    	var isDebugging = false;
+    	var isUploadedCV = false;
+    var dontShowSuccess = false;
+
+    var init = function () {
+        formValidator.selector = {
+            formFeedbackPanel: $("#formFeedbackPanel"),
+            saveBtn: $(".saveBtn"),
+            submitBtn: $(".submitBtn"),
+            showConfirmModalBtn: $(".showConfirmModalBtn"),
+            confirmSubmitBtn: $(".confirmSubmitBtn"),
+            logOffBtn: $(".logOffBtn")
+        };
+
+        // local define
+        formValidator.saveMessage = {
+            "-1": "Invalid email address",// result_code = -1
+            "-2": "Email input and re-type input are not the same.",// result_code = -2
+            "-3": "First name and family name cannot be empty"
+        };
+
+        // from server
+        formValidator.message = {
+            "1": "Saved Successfully",// result_code = 1
+            "2": "Submitted Successfully", // result_code = 2
+            "-1": "Invalid file extension of uploaded file",// result_code = -1
+            "-2": "Invalid file type.",// result_code = -2
+            "-3": "The uploaded file exceeds the maximum allowed size",// result_code = -3
+            "-4": "Unexpected error occurred on server",// result_code = -4
+            "-5": "Unexpected error occurred on server", // result_code = -5
+            "-6": "Email address have been used.", // result_code = -6
+            "-7": "Unexpected error occurred on server", // result_code = -7
+            "-8": "Unexpected error occurred on server", // result_code = -8
+            "noResponse": "Unexpected error occurred on server" // no result_code
+        };
+
+		_fileUploadInit();
+		//bind event
+		_bindingEvent();
+	};
+
+	// file upload with json data of form, which will perform save / submit function
+	var _fileUploadInit = function () {
+		// // try to solve uploading text appearing too slow in mobile
+        // $('#fileupload').click(function(){
+         //    $("#fileName").text('Uploading...');
+		// });
+		$('#fileupload').fileupload({
+			dataType: 'json',
+			formData: "",
+
+			add: function (e, data) {
+				isSelectedFile = true;
+				// show the file name
+				// $("#fileName").text('Uploading: '+data.files[0].name);
+                $("#fileName").text('Uploading...');
+
+				$("form").off("ajaxPost"); //remove the event handler
+				$("form").on("ajaxPost", function(){
+					data.submit();
+				});
+				_save();
+			},
+			done: function (e, data) {
+				if(data.result.result_code >0) {
+					isUploadedCV = true;
+                    var fname = data.files[0].name;
+					$("#fileName").text('Uploaded: '+fname);
+                    var ext = fname.split('.')[fname.split('.').length - 1];
+					$("#cv_name").text('resume.' + ext);
+					$("#download_CV").removeClass("hidden");
+				}
+				_postDone(data.result);
+			},
+			fail: function(e ,data) {
+				_postFail();
+			}
+		});
+
+		// get and put formData before submit
+		$('#fileupload').bind('fileuploadsubmit', function (e, data) {
+			// put json data in fileUpload object
+			data.formData =  {"data": formControl.parseToJsonStr()};
+		});
+
+	};
+
+	var _bindingEvent = function () {
+		formValidator.selector.logOffBtn.on("click", function(){
+			_logOff();
+		});
+		//save button event
+		formValidator.selector.saveBtn.on("click", function(){
+			_save();
+		});
+		//submit button event
+		formValidator.selector.submitBtn.on("click", function(){
+			// not really submit, only validation and callback
+			// alert('submit!');
+			_validateAndCallback();
+		});
+
+		//show ConfirmModal button event
+		formValidator.selector.showConfirmModalBtn.on("click", function(){
+			$("#confirmModal").modal("show");
+		});
+
+		//submit to server
+		formValidator.selector.confirmSubmitBtn.on("click", function(){
+			_submit();
+		});
+
+		$("#clearFile").on("click", function(){
+			_resetFileUploadEvent();
+		});
+	};	
+
+	var _resetFileUploadEvent = function() {
+		isSelectedFile = false;
+		isUploadedCV = false;
+        $('#cv_name').text('');
+		$('#fileupload').fileupload('destroy');
+		_fileUploadInit();
+		$("#fileName").text("No file selected");
+	};
+
+	var _isValidForSave = function() {
+		return 0;//TODO remove this debug line
+		// TODO add a front-end check of file type, current server check does not return error message.
+/*		
+		var resultCode;
+		resultCode = _validateEmailInput();
+		var isEmailInputValid = ( resultCode == 0);
+
+		var firstName = $("#first_name").val();
+		var familyName = $("#family_name").val();
+		if(!isEmailInputValid) {
+			$("#email").focus();
+		}
+		if($.trim(familyName) == "") {
+			$("#family_name").parents(".form-group").addClass("has-error");
+			$("#family_name").focus();
+			resultCode = -3;
+		}
+		if($.trim(firstName) == "") {
+			$("#first_name").parents(".form-group").addClass("has-error");
+			$("#first_name").focus();
+			resultCode = -3;
+		}
+
+		return resultCode; */
+	};
+
+	var _validateEmailInput = function () {
+		//now do not have email check anymore
+		// return 0;	//TODO
+
+		var isValid = true;
+		var $emailInputSelector = $("#email"); //email input selector
+		var $emailRetypeInput = $("#emailRetype"); //retype email selector
+		var emailInput = $("#email").val();
+			errorCode = 0;
+		if($.trim(emailInput) == "" || !validator.validateEmail(emailInput) ) {
+			isValid = false;
+			errorCode = -1;
+		}
+		//no more duplicate email checking
+		// else if (emailInput != $emailRetypeInput.val() ){
+		// 	isValid = false;
+		// 	errorCode = -2;
+		// }
+		if(!isValid) {
+			$emailInputSelector.parents(".form-group").addClass("has-error");
+			$emailRetypeInput.parents(".form-group").addClass("has-error");
+		}
+		return errorCode;
+	};
+
+	var _isNumberInputValid = function() {
+		
+		var isValidNumber = true;
+		$("input:not(.template).numberOnly").each(function(){
+			var input  = $(this).val();
+			if( input!="" && !validator.isPositiveInteger(input) ) {
+				$(this).parents(".form-group").addClass("has-error");
+				isValidNumber = false;
+				var $selector = $(this).parents(".anchorDiv");
+				_showErrorInNavBar($selector);
+			}
+		});
+
+		return isValidNumber;
+	};
+
+	var _showErrorInNavBar =  function($selector) {
+		var anchorId = "#"+$selector.find(".anchor").attr("id");
+		$("a[href='" + anchorId +"']").find(".fa-exclamation").removeClass("hidden");
+	};
+
+	var _isGeneralInputEmpty  =function () {
+		var isEmpty = false;
+		// for all compulsory class but not template
+		$("input.compulsory:not(.template), textarea.compulsory:not(.template), select.compulsory:not(.template)").each(function(){
+			if(_isEmpty(this)) {
+				isEmpty = true;
+				var $selector = $(this).parents(".anchorDiv");
+				console.log("text empty");
+				console.log($selector);
+				console.log(this);
+				_showErrorInNavBar($selector);
+			}
+		});
+		isEmpty = false;
+		// get all input:radio field name and validate it
+		var radioInputNameArray = _getRadioInputName();
+		for(var i = 0; i < radioInputNameArray.length; i++ ) {
+			var checkedRadioSelector = "input:not(.template):radio[name=" + radioInputNameArray[i] + "]:checked";
+			if( $(checkedRadioSelector).length != 1) {
+				$("input[name=" + radioInputNameArray[i] + "]").parents(".form-group").addClass("has-error");
+				isEmpty = true;
+				console.log("radio empty");
+				var $selector = $("input[name=" + radioInputNameArray[i] + "]").parents(".anchorDiv");
+				_showErrorInNavBar($selector);
+			} 
+		}
+
+		// input:checkbox
+		var checkboxNameArray = _getCheckboxName();
+		for(var i = 0; i < checkboxNameArray.length; i++ ) {
+			var checkedSelector = "input:not(.template):checkbox[name=" + checkboxNameArray[i] + "]:checked";
+			if( $(checkedSelector).length < 1) {
+				$("input[name=" + checkboxNameArray[i] + "]").parents(".form-group").addClass("has-error");
+				isEmpty = true;
+				console.log("checkbox empty");
+				var $selector = $("input[name=" + checkboxNameArray[i] + "]").parents(".anchorDiv");
+				_showErrorInNavBar($selector);
+			}
+		}
+		return isEmpty;
+	};
+
+	// helper function of _isGeneralInputEmpty
+	var _isEmpty = function(selector) {
+		var inputValue = $(selector).val();
+		if(typeof inputValue == "undefined" || inputValue == null || $.trim(inputValue) == "") {
+			$(selector).parents(".form-group").addClass("has-error");
+			return true;
+		}
+		return false;
+	};
+
+	var _getRadioInputName = function() {
+		var radioArray = [];
+		$("input.compulsory:radio").each(function(){
+			var name = $(this).attr("name");
+			if($.inArray( name, radioArray) == -1) {
+				radioArray.push(name);
+			}
+		});
+		return radioArray;
+	};
+
+	var _getCheckboxName = function() {
+		var checkboxArray = [];
+		$("input.compulsory:checkbox").each(function(){
+			var name = $(this).attr("name");
+			if($.inArray( name, checkboxArray) == -1) {
+				checkboxArray.push(name);
+			}
+		});
+		return checkboxArray;
+	};
+
+	var _checkConditionalCompulsory = function(){
+		var result = true;
+		$(".conditionalCompulsoryCollection").not(".template").each(function(){
+			var newObject = $(this).serializeObject();
+
+			if( !utilities.isEmptyObject(newObject) ) {
+
+				$(this).find("input.conditionalCompulsory, textarea.conditionalCompulsory, select.conditionalCompulsory").each(function(){
+
+					if(_isEmpty($(this))) {
+						result = false;
+						var $selector = $(this).parents(".anchorDiv");
+						_showErrorInNavBar($selector);
+					}
+
+				});
+			}
+		});
+		return result;
+	};
+	var _isUploadedCV = function(){
+
+		// if($('#cv_name').text()!=='')
+		if(isUploadedCV)
+			return true;
+		$('#download_CV').parent().addClass('has-error');
+		var $selector = $('#cv_upload_anchor').parents(".anchorDiv");
+		_showErrorInNavBar($selector);
+		return false;
+	};
+
+	var _save = function () {
+		// resetTimer();
+		// clear all feedback
+		$(".form-group").removeClass("has-error has-success");
+		$(".fa.fa-exclamation").addClass("hidden");
+		// check compulsory field that for retreive  
+		var errorCode = _isValidForSave();
+		var isValidForSave = (errorCode == 0);
+		//if valid, change form action and submit
+
+		if(isValidForSave) {
+			if(isSelectedFile) {
+				$('#fileupload').fileupload( 'option', 'url', appUrlRoot+"/save");
+				$("form").trigger("ajaxPost");
+			} else {
+				//parse form data to json
+				var saveData = formControl.parseToJsonStr();
+				//ajax call
+				$.ajax({
+					type: 'POST',
+					contentType: "application/json",
+					url: appUrlRoot + "/save",
+					data: saveData
+				})
+				.done( function ( data ) {
+					// _postDone(data);
+					console.log('_save done');
+				})
+				.fail(function ( ){
+					_postFail();
+				})	
+			}
+		} else {
+		//	var errorMessage = formValidator.saveMessage[errorCode];
+			var errorMessage = formValidator.message[errorCode];
+			customAlert.errorAlert(errorMessage);
+		}
+	};
+
+	var _validateAndCallback = function () {
+		var submitFeedback = [];
+		// clear all feedback
+		$(".form-group").removeClass("has-error has-success");
+		$(".fa.fa-exclamation").addClass("hidden");
+		formValidator.selector.formFeedbackPanel.addClass("hidden");
+
+		/* submit validation */
+		var isValid = true;
+		
+		// check all compulsory field
+		var emailValidationCode = _validateEmailInput();
+		if( emailValidationCode != 0) {
+			submitFeedback.push(formValidator.saveMessage[emailValidationCode]);
+			isValid = false;
+		}
+		if( _isGeneralInputEmpty() ) {
+			submitFeedback.push("Some compulsory fields are empty.");
+			isValid = false;
+		}
+		//check input only accept number
+		if(!_isNumberInputValid()) {
+			submitFeedback.push("Some input fields only accept number.");
+			isValid = false;
+		}
+
+		// check max-word
+		var numberOfOverMaxInputField =  $(".overMaximum").length;
+		if(numberOfOverMaxInputField > 0) {
+			$(".overMaximum").each(function() {
+				$(this).parents(".form-group").addClass("has-error");
+				var $selector = $(this).parents(".anchorDiv");
+				_showErrorInNavBar($selector);
+			});
+			submitFeedback.push("The numbers of word over maximum.");
+			isValid = false;
+		}
+
+		// check conditional compulsory field
+		 if(!_checkConditionalCompulsory()) {
+		 	isValid = false;
+		 }
+		 if(!_isUploadedCV()){
+			 submitFeedback.push("CV haven't Uploaded.");
+			isValid = false;
+		}
+		// checking where exists saved resume or have selected file
+		// if(!isSelectedFile && $("#cv_name").text() == "") {
+		// 	isValid = false;
+		// 	$("#cv_name").parents(".form-group").addClass("has-error");
+		// 	submitFeedback.push("Please upload your resume.");
+		// }
+		$("#formFeedbackList").html("");
+		for(var i = 0; i < submitFeedback.length; i++){
+			var $li = '<li class="list-group-item">' + submitFeedback[i] + '</li>';
+			$("#formFeedbackList").append($li);
+		}
+		
+		if(isValid || isDebugging) {	//TODO remove fake valid form
+		// if(isValid) {
+			// show preview
+            // console.log('$(\'input[name="accept_declaration"]\')',$('input[name="accept_declaration"]'));
+			// alert('$(\'input[name="accept_declaration"]\').val()',$('input[name="accept_declaration"]').val());
+            // alert($('input[name="accept_declaration"]').val() == 'yes');
+			if($('input[name="accept_declaration"]:checked').val() == 'yes'){
+                formControl.updateAndShowSummary();
+			}
+			else{
+				alert('Sorry, you have to declare that the information you provided is true in "Declaration" in order to proceed.');
+			}
+		} else {
+			//else show feedback 
+			customAlert.errorAlert("<strong>Submission Failure</strong>: Please review your form.");
+			formValidator.selector.formFeedbackPanel.removeClass("hidden");
+			$('html, body').animate({ scrollTop: $('#formFeedbackPanel').offset().top-50 }, 'fast');
+		}
+
+	};
+
+	var _submit = function () {
+
+		if(isSelectedFile) {
+			$('#fileupload').fileupload( 'option', 'url', appUrlRoot+"/submit");
+			$("form").trigger("ajaxPost");
+		} else {
+			//parse form data to json
+			var saveData = formControl.parseToJsonStr();
+			console.log('_submit saveData',saveData);
+			//ajax call
+			$.ajax({
+				type: 'POST',
+				contentType: "application/json",
+				url: appUrlRoot + "/submit",
+				data: saveData
+			})
+			.done( function (data) {
+				if(dontShowSuccess){
+					alert('debug mode: submit success.');
+                    $("#confirmModal").find('.btn-default').click();
+                    $(".backBtn").click();
+                    window.scrollTo(0, 0);
+				}
+				else{
+                    _postDone(data);
+				}
+
+			})
+			.fail(function ( ){
+                if(isDebugging){
+                    alert('debug mode: submit failed.');
+                    $("#confirmModal").find('.btn-default').click();
+                    $(".backBtn").click();
+                    window.scrollTo(0, 0);
+                }
+                else{
+                    _postFail();
+                }
+			})	
+		}
+	};
+
+	var _logOff = function() {
+		window.location.href = appUrlRoot +"/logout";
+	};
+
+	var _postDone = function(jsonResult) {
+
+		// Fixed IE 8/9 iframe upload
+		if (typeof jsonResult == "string") {
+			jsonResult = jQuery.parseJSON( jsonResult );
+		}
+		
+		// if save or submit success
+		if(jsonResult.result_code > 0 ) {
+			var message = formValidator.message[jsonResult.result_code];
+			if(jsonResult.result_code == 1) {
+				if(jsonResult.token != ""){
+					// $("#tokenModal").modal("show");
+					// $("#generatedToken").html(jsonResult.token);
+				} 
+			} else if(jsonResult.result_code == 2) {
+				showPromptDialog = false;
+				window.location.href = appUrlRoot +"/success";
+			}
+			if(jsonResult.result_code != 1){
+                customAlert.successAlert(message);
+			}
+
+		} else if(jsonResult.result_code < 0) {
+			var message = formValidator.message[ jsonResult.result_code ];
+			// if cv have pro
+			if(　jsonResult.result_code > -4　) {// result_code between -1 to -3
+				formControl.hideSummaryAndShowForm();
+				$("#confirmModal").modal("hide");
+				$("#fileupload").focus();
+				$("#fileupload").parents(".form-group").addClass("has-error");
+				var $selector = $("#fileupload").parents(".anchorDiv");
+				_showErrorInNavBar($selector);
+			}
+
+			customAlert.errorAlert(message);
+		} else {
+			var message = formValidator.message["noResponse"];
+			customAlert.errorAlert(message);
+		}
+	};
+
+	var _postFail = function() {
+		customAlert.errorAlert("Fail to connect server / Unexpected error occurred on server");
+        $("#fileName").text('Upload failed.');
+        $('#cv_name').text('');
+        isUploadedCV = false;
+	};
+
+	return {
+		init: init
+	};
+})();

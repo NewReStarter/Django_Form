@@ -1,0 +1,34 @@
+﻿var validator = (function () {
+
+	var validateEmail = function (email) {
+		var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	    return regex.test(email);
+    };
+
+    // var isValidLength = function(input, limit) {
+    // 	var length = input.length;
+    // 	return (length <= limit);
+    // };
+
+	var isPositiveInteger = function(string) {
+		var regex = /^(([\d])+)$/;
+		return regex.test(string);
+	};
+
+	// var isInMonthRange = function(input) {
+	// 	return (input >= 0 && input <= 12);
+	// };
+
+	var isValidV4IPAddress = function(ip) {
+		var regex = /\b(?:(?:2(?:[0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9])\.){3}(?:(?:2([0-4][0-9]|5[0-5])|[0-1]?[0-9]?[0-9]))\b/i;
+		return regex.test(ip);
+	}
+  
+	return {
+		validateEmail: validateEmail,
+		// isValidLength: isValidLength,
+		isPositiveInteger: isPositiveInteger,
+		isValidV4IPAddress: isValidV4IPAddress
+	};
+
+})();

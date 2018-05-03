@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link rel="icon" type="image/ico" href="https://devcloudaws.ehrdesign.com/lawrence/jtsummer/images/logo_ico.ico">
+    <link href="/static/index/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/select2.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/select2-bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/datepicker3.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/jquery.fileupload.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/theme.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/main.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/alert.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/application_summary.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/print.css" rel="stylesheet" type="text/css">
+    <link href="/static/index/notosanssc.css" rel="stylesheet" type="text/css">
+    <link href="/static/layui/css/layui.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+		  <script src="/lawrence/jtsummer/lib/html5shiv.min.js"></script>
+		  <script src="/lawrence/jtsummer/lib/respond.min.js"></script>
+		<![endif]-->
+
+    <script type="text/javascript" src="/static/index/jquery-1.11.1.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap-maxlength.js.下载"></script>
+    <script type="text/javascript" src="/static/index/select2.min.js.下载"></script>
+    <script type="text/javascript" src="/static/index/bootstrap-datepicker.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.ui.widget.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.iframe-transport.js.下载"></script>
+    <script type="text/javascript" src="/static/index/jquery.fileupload.js.下载"></script>
+
+    <script type="text/javascript" src="/static/index/mdn.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form_control.js.下载"></script>
+    <script type="text/javascript" src="/static/index/form_validator.js.下载"></script>
+    <script type="text/javascript" src="/static/index/alert.js.下载"></script>
+    <script type="text/javascript" src="/static/index/validator.js.下载"></script>
+    <script type="text/javascript" src="/static/index/utilities.js.下载"></script>
+    <script type="text/javascript" src="/static/index/application_summary.js.下载"></script>
+    <script>
+        var appUrlRoot = '/lawrence/jtsummer/index.cfm';
+        var savedData = "";
+        var resumeInfo = "";
+    </script>
+    <style>
+        .anchor {
+            display: inline-block;
+            width: 100%;
+            padding: 0;
+            margin-bottom: 10px;
+            font-size: 21px;
+            line-height: inherit;
+            color: #333;
+            border: 0;
+            margin-top: 25px;
+            border-bottom: 2px solid #115798;
+        }
+    </style>
+</head>
+<body>
+<div id="content" style="margin: 20px;">
+    <form class="form-horizontal">
+        {% for item in data %}
+            <div class="parentKey anchorDiv">
+                <p class="anchor legend">
+                    {{ item.text }}
+                </p>
+                {% for question in item.questions %}
+                    <div class="form-group" style="margin-left: 30px;">
+                        <label class="control-label">
+                            {{ question.text }}({{ question.addtion_info }})
+                        </label>
+                        <div>
+                            {% for answer in question.answer %}
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ answer }}<br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </form>
+</div>
+{% if result %}
+    <button id="pdfBtn" class="btn btn-outline-primary">Export To PDF</button>
+{% endif %}
+<script>
+    $('#pdfBtn').click(function () {
+        window.location.href = '/myadmin/form_data/download?id={{ id }}';
+    });
+</script>
+</body>
+</html>

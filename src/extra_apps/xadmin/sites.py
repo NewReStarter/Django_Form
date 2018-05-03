@@ -100,7 +100,7 @@ class AdminSite(object):
             if isinstance(model, ModelBase):
                 if model._meta.abstract:
                     raise ImproperlyConfigured('The model %s is abstract, so it '
-                                               'cannot be registered with admin.' % model.__name__)
+                                               'cannot be registered with myadmin.' % model.__name__)
 
                 if model in self._registry:
                     raise AlreadyRegistered(
@@ -127,7 +127,7 @@ class AdminSite(object):
                     admin_class = type(str(
                         "%sAdmin" % model.__name__), (admin_class,), options)
 
-                # Instantiate the admin class to save in the registry
+                # Instantiate the myadmin class to save in the registry
                 self._registry_avs[model] = admin_class
 
     def unregister(self, model_or_iterable):
@@ -156,13 +156,13 @@ class AdminSite(object):
     def has_permission(self, request):
         """
         Returns True if the given HttpRequest has permission to view
-        *at least one* page in the admin site.
+        *at least one* page in the myadmin site.
         """
         return request.user.is_active and request.user.is_staff
 
     def check_dependencies(self):
         """
-        Check that all things needed to run the admin have been correctly installed.
+        Check that all things needed to run the myadmin have been correctly installed.
 
         The default implementation checks that LogEntry, ContentType and the
         auth context processor are installed.
@@ -171,17 +171,17 @@ class AdminSite(object):
 
         if not ContentType._meta.installed:
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
-                                       "your INSTALLED_APPS setting in order to use the admin application.")
+                                       "your INSTALLED_APPS setting in order to use the myadmin application.")
 
         default_template_engine = Engine.get_default()
         if not ('django.contrib.auth.context_processors.auth' in default_template_engine.context_processors or
                 'django.core.context_processors.auth' in default_template_engine.context_processors):
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
-                                       "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
+                                       "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the myadmin application.")
 
     def admin_view(self, view, cacheable=False):
         """
-        Decorator to create an admin view attached to this ``AdminSite``. This
+        Decorator to create an myadmin view attached to this ``AdminSite``. This
         wraps the view and provides permission checking by calling
         ``self.has_permission``.
 
@@ -219,7 +219,7 @@ class AdminSite(object):
 
         if name in self._registry_settings:
             return self._registry_settings[name]
-        elif name.endswith('admin') and name[0:-5] in self._registry_settings:
+        elif name.endswith('myadmin') and name[0:-5] in self._registry_settings:
             return self._registry_settings[name[0:-5]]
         elif name.endswith('adminview') and name[0:-9] in self._registry_settings:
             return self._registry_settings[name[0:-9]]
@@ -306,7 +306,7 @@ class AdminSite(object):
             path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n')
         ]
 
-        # Registed admin views
+        # Registed myadmin views
         # inspect[isclass]: Only checks if the object is a class. With it lets you create an custom view that
         # inherits from multiple views and have more of a metaclass.
         urlpatterns += [
@@ -342,15 +342,15 @@ class AdminSite(object):
     def i18n_javascript(self, request):
         from django.views.i18n import JavaScriptCatalog
         """
-        Displays the i18n JavaScript that the Django admin requires.
+        Displays the i18n JavaScript that the Django myadmin requires.
 
         This takes into account the USE_I18N setting. If it's set to False, the
         generated JavaScript will be leaner and faster.
         """
-        return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
+        return JavaScriptCatalog.as_view(packages=['django.contrib.myadmin'])(request)
 
-# This global object represents the default admin site, for the common case.
-# You can instantiate AdminSite in your own code to create a custom admin site.
+# This global object represents the default myadmin site, for the common case.
+# You can instantiate AdminSite in your own code to create a custom myadmin site.
 site = AdminSite()
 
 

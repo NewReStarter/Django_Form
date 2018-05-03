@@ -1,5 +1,5 @@
 """
-Form Widget classes specific to the Django admin site.
+Form Widget classes specific to the Django myadmin site.
 """
 from __future__ import absolute_import
 from itertools import chain
@@ -62,7 +62,7 @@ class AdminSelectWidget(forms.Select):
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
-    A SplitDateTime Widget that has some admin-specific styling.
+    A SplitDateTime Widget that has some myadmin-specific styling.
     """
 
     def __init__(self, attrs=None):

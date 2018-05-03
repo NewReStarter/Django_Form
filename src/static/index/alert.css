@@ -1,0 +1,34 @@
+﻿#FeedbackDiv{
+	position: fixed;
+	top: 0px;
+	padding-top: 3px;
+	padding-right: 3px;
+	z-index: 5000;
+	}
+#FeedbackDiv .alert {
+	margin-bottom: 1px;
+	word-wrap: normal;
+}
+
+@media (min-width: 992px) {
+
+	#FeedbackDiv{
+		right: 0px;
+		/*float: right;*/
+	}
+	#FeedbackDiv .alert {
+		min-width: 350px;
+		max-width: 350px;
+		float: right;
+	}
+}
+
+@media (max-width: 991px) {
+	
+	#FeedbackDiv{
+		padding-left: 3px;
+		width: 80%;
+		left: 10%;
+	}
+}
+

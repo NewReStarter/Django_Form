@@ -1,0 +1,161 @@
+﻿var jsonToInfoPresenter = (function () {
+
+    var init = function (data) {
+        if(data['second_nationality']){
+           $("#summarySecondNationality").show();
+        }
+        else{
+            $("#summarySecondNationality").hide();
+        }
+
+        // var applicantName = data["personal_info"].first_name + " " + data["personal_info"].middle_name + " " +data["personal_info"].family_name
+        var applicantName = data["personal_info"].first_name + " " +data["personal_info"].family_name;
+        $("#applicant_name").text(applicantName);
+
+        $.each(data, function(parentKey, object) {
+            //if not empty object/array and non-multiple record
+            if(object.length == undefined && !_isMultiRecordCategory(parentKey) ) {
+                $.each(object, function(key, value) {
+                    var selector = $("[json-key='" + key + "']")[0];
+                    // special handle Recruitment source
+                    if(key == "source") {
+                        value = sourceHandler(object);
+                    }
+                    // for all yes no question
+                    if(key == "have_connection_with_jardines" || key == "have_apply_before" || key == "accept_declaration" || key == "accept_info_transfer") {
+                        if( value == "yes") {
+                            value = '<i class="text-success fa fa-lg fa-check-circle"></i> Yes';
+                        } else if( value == "no") {
+                            value = '<i class="text-danger fa fa-lg fa-times-circle"></i> No';
+                        }
+                    }
+                    if( (key == "detail_of_connection" || key == "detail_of_have_apply_before") && value != "") {
+                        value = " - " + value;
+                    }
+                    value = value || "n/a"; // if value is empty string, then set to "n/a"
+                    $(selector).html(value);
+                });
+            } else {
+                var categorySelector = $("[json-object='" + parentKey + "']")[0];
+                if( object.length == 0 ) {
+                    var $tempDOM = $('<div class="item-group collection "></div>');
+                    $tempDOM
+                        .append($("<span></span>")
+                        .addClass("list-item col-xs-12 text-center text-muted")
+                        .text("No Record"));
+                    $(categorySelector).append($tempDOM);
+
+                } else {
+                    for(var i = 0 ; i < object.length; i++ ) {
+                        _appendclonedDom(categorySelector, object[i]);
+                    }
+                }
+            }
+        });
+
+        // // special handle Recruitment source
+        // if( data["recruitment_sources"].specific_of_career_talk_or_fair == "" && data["recruitment_sources"].specific_of_referral == "" &&  data["recruitment_sources"].specific_of_other_source == "" &&  data["recruitment_sources"].specific_of_target_email == "") {
+        //     $($("[json-key='specific_of_career_talk_or_fair']")[0]).text("n/a");
+        // }
+
+         // special handle Career Information Questionnaires
+        if( data["career_information_questionnaire"].have_connection_with_jardines == "no" ){
+             $($("[json-key='detail_of_connection']")[0]).text("");
+        }
+        if(  data["career_information_questionnaire"].have_apply_before  == "no") {
+            $($("[json-key='detail_of_have_apply_before']")[0]).text("");
+        }
+
+
+        var filename =  data["cv_upload"].display_file_name || "No File";
+        $("[json-key='display_file_name']").text(filename);
+    };
+
+    var sourceHandler = function(object) {
+         var temp = "";
+        var value = object['source'];
+        if( typeof value == "string") {
+            value = [value];
+        }
+        $.each(value, function(index, element) {
+            if(index != 0) {
+                temp += ", ";
+            }
+            if(element == "Career Talk/Fair") {
+                var detail = object["specific_of_career_talk_or_fair"];
+                temp += element + "(" + detail + ")";
+            } else if(element == "Referral") {
+                var detail = object["specific_of_referral"];
+                temp += element + "(" + detail + ")";
+            } else if( element == "Target Email") {
+                var detail = object["specific_of_target_email"];
+                temp += element + "(" + detail + ")";
+            } else if( element == "Others") {
+                var detail = object["specific_of_other_source"];
+                temp += element + "(" + detail + ")";
+            } else if( element == "job_posting_website"){
+                var detail = object["specific_of_job_posting"];
+                temp += element + "(" + detail + ")";
+            }
+            else {
+                temp += element;
+            }
+        });
+        return temp;
+    };
+
+    var clear = function() {
+        $("#summaryDiv").find(".collection:not(.template)").remove();
+    };
+
+    var _isMultiRecordCategory = function(keyName) {
+        switch(keyName) {
+            case "tertiary_education":
+            case "secondary_education":
+            case "academic_attainment":
+            case "scholarship":
+            case "activities":
+            case "activities_at_secondary_school":
+            case "working_exp":
+            case "overseas_exchange_programme_experience":
+            case "gap_year":
+            case "other_overseas_experience":
+                return true;
+                break;
+            default:
+               return false;
+        }
+    };
+
+    var _appendclonedDom = function(categorySelector, object) {
+
+        var newCollection = _cloneTemplate(categorySelector);
+
+        $.each(object, function(key, value) {
+            value = value || "n/a";
+            if(key == "university_of_tertiary_education" && value == "Others") {
+                value += " (" + object["other_university_of_tertiary_education"] + ")";
+            }
+            if(key == "ranking" && value == "Others") {
+                value += " (" + object["other_ranking"] + ")";
+            }
+            $(newCollection).find("[json-key='" + key + "']").html(value);
+        });
+        $(newCollection).removeClass("hidden template").appendTo($(categorySelector));
+        var count = $(categorySelector).find(".collection:not(.hidden, .template)").length;
+        $(newCollection).find("span.recordIndex").html(count);
+
+    };
+
+    var _cloneTemplate = function(categorySelector) {
+        return $(categorySelector).find(".template.collection").clone();
+    };
+
+
+    return {
+        init: init,
+        clear: clear
+    };
+
+})();
+

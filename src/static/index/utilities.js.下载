@@ -1,0 +1,339 @@
+﻿var utilities = (function () {
+    var localeMap = {
+        "en" : "English",
+        "da" : "Danish",
+        "id" : "German",
+        "fr" : "French",
+        "ms" : "Malay",
+        "ko" : "Korean",
+        "es" : "Spanish",
+        "pl" : "Polish",
+        "ru" : "Russian",
+        "zh_CN" : "Chinese Simplified",
+        "zh_TW" : "Chinese Traditional",
+        "se" : "Swedish",
+        "tr" : "Turkish",
+        "nl" : "Dutch"
+    };
+	var errorMessage = {
+		"error" : "Failed to connect to server or Unexpected error occurred on server",
+		"noResponse" : "Please sign in again"
+	};
+	//different from $.isEmptyObject
+	var isEmptyObject = function(object) {
+		var result = true;
+		$.each(object, function(key, value) {
+			if($.trim(value) != "") {
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	}
+	//check each object in array is empty
+	var isAllEmptyObject = function(array) {
+		var result = true;
+
+		$.each(array, function(index, object) {
+			if(!isEmptyObject(object)) {
+				result = false;
+				return false;
+			}
+		});
+		return result;
+	};
+
+    var getSVIPages = function (whichPage,stateArrIn) {//show records from 1 to 100
+        var def = $.Deferred();
+        requests = [];
+        var AjaxUrl = appUrlRoot + "/get/sonru/interview";
+        var dataBundle = [];
+        var success = true;
+        var stateArr = stateArrIn||['sent', 'archived', 'draft'];//sent contain closed
+        stateArr.forEach(function (val, key) {
+            requests.push(utilities.simpleAjaxCall(appUrlRoot + "/get/sonru/interview", {
+                    'PER_HUNDRED_SET': whichPage,
+                    'State': val
+                }).done(function (data) {
+                    if (data.success) {
+                        var tmp = data.interview_arr;
+                      	var tmpData = [];
+                        tmp.forEach(function (val2, k2) {
+                            tmpData[k2] = val2;
+                        });
+
+                        dataBundle = dataBundle.concat(tmpData);
+
+                    } else {
+                        success = false;
+                    }
+                }).fail(function (e){
+
+				})
+            );
+        });
+        $.when.apply($, requests).then(function () {
+			if(success)
+                def.resolve( dataBundle);
+           else
+                def.reject(false);
+
+        },function(){
+            def.reject();
+		});
+        return def.promise();
+    };
+    var setForm =function ($form,jsondata) {
+		$.each(jsondata,function (k,v){
+            $form.find("input[name='" + k + "']").val(v);
+            $form.find('select[name="'+ k + '"]').not('.template').val(v);
+            $form.find('textarea[name="'+ k + '"]').not('.template').val(v);
+		});
+
+    };
+	// hidden form
+    var formatFileSize = function(bytes) {
+        if (typeof bytes !== 'number') {
+            return '';
+        }
+        if (bytes >= 1000000000) {
+            return (bytes / 1000000000).toFixed(2) + ' GB';
+        }
+        if (bytes >= 1000000) {
+            return (bytes / 1000000).toFixed(2) + ' MB';
+        }
+        return (bytes / 1000).toFixed(2) + ' KB';
+    }
+	var open = function(method, url, data, target) {
+		var form = document.createElement("form");
+		form.action = url;
+		form.method = method;
+		form.target = target || "_self";
+		if (data) {
+			for (var key in data) {
+			  var input = document.createElement("textarea");
+			  input.name = key;
+			  input.value = typeof data[key] === "object" ? JSON.stringify(data[key]) : data[key];
+			  form.appendChild(input);
+			}
+		}
+		form.style.display = 'none';
+		document.body.appendChild(form);
+		form.submit();
+		form.remove();
+	};
+    var cloneTemplate = function(base, template_name) {
+    	console.log("." + (template_name||'template'))
+        var template = $(base).find("." + (template_name||'template'));
+        console.log('temp',template)
+        var clone = template.clone().removeClass((template_name||'template') + " hidden");
+        $(base).append(clone);
+        return clone;
+    };
+
+	var simpleAjaxCall = function(ajaxUrl, object, callback,method){
+        var def = $.Deferred();
+		if(object != "" && object != null) {
+			object = JSON.stringify(object);
+		}
+
+		$.ajax({
+			type: method||'POST',
+			contentType: "application/json",
+			url: ajaxUrl,
+			data: object
+		})
+		.done( function ( data , textStatus, jqXHR) {
+			//console.log('data',  data)
+            //console.log('textStatus',textStatus)
+            //console.log('jqXHR',jqXHR)
+			if(typeof data === 'string'){
+				try {
+					var dt = JSON.parse(data);
+					if(typeof dt.success!== 'undefined'&& !dt.success)
+                        customAlert.errorAlert("Failed to retrieve data from third party service provider.");
+				}catch(e){
+					//is string and cannot parse to JSON, assume that is logged out
+					//http://123.176.103.142/Kevin/seats_v2/index.cfm/admin
+                    customAlert.infoAlert(errorMessage["noResponse"]);
+				}
+			}
+			if(typeof callback=='function')
+				callback(data);
+            def.resolve(data);
+		})
+		.fail (function(jqXHR, textStatus, errorThrown){
+			alertUnexpectedError();
+            def.reject(errorThrown);
+		})
+		return def;
+	};
+	var toHTMLLineBreak = function ( str ) {
+		str = ""+str;
+		return str.replace( /\r\n|\r|\n/g, '<br />' );
+	};
+
+	var toHTMLSpace  =function (str) {
+		str = "" + str;
+		return str.replace( /\s/g, '&nbsp;');
+	};
+
+	var alertUnexpectedError = function(){
+		customAlert.errorAlert(errorMessage["error"]);
+	};
+
+	var selectElementContents =  function(el) {
+	    var range = document.createRange();
+	    range.selectNodeContents(el);
+	    var sel = window.getSelection();
+	    sel.removeAllRanges();
+	    sel.addRange(range);
+	};
+
+	var strRemoveHTMLtags = function(string){
+        return string.replace(/<\/?[^>]+(>|$)/gim, "");
+    };
+    var getFormData = function (frm) {
+        var unindexed_array = $(frm).serializeArray();
+        var indexed_array = {};
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+        return indexed_array;
+    }
+    var doubleScroll = function (dom) {
+    	var topScrollBar = $('<div class="donald-doubleScroll-scroll-wrapper" style="height: 17px;"></div>');
+    	var innerWrapper = $('<div class="donald-doubleScroll-scroll" style="height: 17px;"></div>');
+    	topScrollBar.append(innerWrapper);
+
+    	var css = {
+		    		scrollCss: {
+						'overflow-x': 'scroll',
+						'overflow-y':'hidden'
+			        },
+					contentCss: {
+						'overflow-x': 'scroll',
+						'overflow-y':'hidden'
+					}
+				};
+
+		if($(dom).hasClass('dataTable')){
+			$(dom).parents('.dataTables_scrollBody').before(topScrollBar);
+
+			// bind upper scroll to bottom scroll
+	        topScrollBar.scroll(function(){
+	            $(dom).parents('.dataTables_scrollBody').scrollLeft(topScrollBar.scrollLeft());
+	        });
+
+	        // bind bottom scroll to upper scroll
+	        $(dom).parents('.dataTables_scrollBody').scroll(function(){
+	            topScrollBar.scrollLeft($(dom).parents('.dataTables_scrollBody').scrollLeft());
+	        });
+
+	        // set the width of the wrappers
+    		topScrollBar.width($(dom).parents('.dataTables_scrollBody')[0].clientWidth);
+        	$(window).resize(function () {
+        		topScrollBar.width($(dom).parents('.dataTables_scrollBody')[0].clientWidth);
+        	});
+        } else {
+        	$(dom).before(topScrollBar);
+
+			// bind upper scroll to bottom scroll
+	        topScrollBar.scroll(function(){
+	            $(dom).scrollLeft(topScrollBar.scrollLeft());
+	        });
+
+	        // bind bottom scroll to upper scroll
+	        $(dom).scroll(function(){
+	            topScrollBar.scrollLeft($(dom).scrollLeft());
+	        });
+
+	        // set the width of the wrappers
+    		topScrollBar.width($(dom)[0].clientWidth);
+        	$(window).resize(function () {
+        		topScrollBar.width($(dom)[0].clientWidth);
+        	});
+        }
+        // apply css
+        topScrollBar.css(css.scrollCss);
+        $(dom).css(css.contentCss);
+
+        // set the width of the wrappers
+        innerWrapper.width($(dom)[0].scrollWidth);
+
+        // on table width change, reset the topScrollBar width
+		var target = $(dom)[0];
+		var observer = new MutationObserver(function(mutations) {
+		  mutations.forEach(function(mutation) {
+		  	if(mutation.type === 'attributes' && mutation.attributeName === 'style')
+        		innerWrapper.width($(dom)[0].scrollWidth);
+		  });
+		});
+		var config = { attributes: true };
+		observer.observe(target, config);
+
+	};
+
+	return {
+        localeMap:localeMap,
+		errorMessage: errorMessage,
+		isEmptyObject: isEmptyObject,
+		isAllEmptyObject: isAllEmptyObject,
+		open: open,
+		simpleAjaxCall: simpleAjaxCall,
+		setForm:setForm,
+		toHTMLLineBreak: toHTMLLineBreak,
+		toHTMLSpace: toHTMLSpace,
+		alertUnexpectedError: alertUnexpectedError,
+		selectElementContents: selectElementContents,
+		strRemoveHTMLtags: strRemoveHTMLtags,
+		doubleScroll: doubleScroll,
+		getSVIPages:getSVIPages,
+        getFormData:getFormData,
+        formatFileSize:formatFileSize,
+        cloneTemplate:cloneTemplate,
+	};
+
+})();
+$(function(){
+	$( document ).ajaxStart(function() {
+		$.ajaxSetup({ cache: false});
+	});
+	// formElement to json parse
+	$.fn.serializeObject = function(selector) {
+		var inputFields;
+		var obj = {};
+
+		if(selector) {
+			inputFields = selector;
+		} else {
+			inputFields = ".formElement";
+		}
+
+		$(this).find(inputFields).not('.template').each(function(){
+			if(this.name !== undefined && this.name != "") {
+				//if( (not radio and not checkbox) OR ( checked radio ) )
+				if( ( !$(this).is(':radio') && !$(this).is(':checkbox') ) || ($(this).is(':radio') && $(this).prop("checked")) ){
+
+					if (obj[this.name] !== undefined) {
+						if (!obj[this.name].push) {
+							obj[this.name] = [obj[this.name]];
+						}
+						obj[this.name].push(this.value || '');
+					} else {
+						obj[this.name] = this.value || '';
+					}
+				} else if( $(this).is(':checkbox') && $(this).prop("checked")) { //else if is checked checkbox
+					if (obj[this.name] !== undefined) {
+						obj[this.name].push(this.value || '');
+					} else {
+						var jsonValue = this.value || '';
+						obj[this.name] = [jsonValue];
+					}
+				}
+			}
+		});
+	    return obj;
+	};
+
+});

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>团队管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/bootstrap-4.0.0-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/bootstrap-table/bootstrap-table.css">
+    <script src="/static/jquery.min.js"></script>
+    <script src="/static/bootstrap-4.0.0-dist/js/bootstrap.js"></script>
+    <script src="/static/bootstrap-table/bootstrap-table.js"></script>
+    <script src="/static/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="/static/layui/layui.all.js"></script>
+    <style>
+        #toolbar {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<table id="table"></table>
+<script type="text/javascript">
+    var layer = layui.layer;
+    $('#table').bootstrapTable({
+        url: '/myadmin/question/GetList',
+        method: 'post',
+        pagination: true,
+        paginationLoop: true,
+        sidePagination: 'server',
+        pageSize: 10,
+        singleSelect: true,
+        idField: 'id',
+        search: true,
+        searchAlign: 'right',
+        sortName: 'id',
+        sortOrder: 'desc',
+        paginationPreText: 'Previous Page',
+        paginationNextText: 'Next Page',
+        clickToSelect: true,
+        smartDisplay: true,
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        columns: [
+            {checkbox: true},
+            {field: 'title', title: 'Question'},
+            {field: 'type', title: 'type'},
+            {field: 'describe', title: 'description'},
+            {
+                field: 'allow_multiple', title: 'allow multiple', formatter: function (val, row) {
+                    if (val)
+                        return '<span class="layui-bg-red">Yes</span>';
+                    else
+                        return '<span class="layui-bg-green">No</span>';
+                }
+            },
+            {
+                field: 'require', title: 'allow empty', formatter: function (val, row) {
+                    if (val)
+                        return '<span class="layui-bg-green">No</span>';
+                    else
+                        return '<span class="layui-bg-red">Yes</span>';
+                }
+            },
+            {field: 'create_time', title: 'create time'},
+            {field: 'modify_time', title: 'modify time'},
+            {field: 'length', title: 'length'},
+            {
+                field: 'status', title: 'status', formatter: function (val, row) {
+                    switch (val) {
+                        case 0:
+                            return '<span class="layui-bg-green">Deactivated</span>';
+                            break;
+                        case 1:
+                            return '<span class="layui-bg-red">Activated</span>';
+                            break;
+                        default:
+                            return '<span class="layui-bg-red">Error</span>';
+                            break;
+                    }
+                }
+            },
+        ],
+        ajaxOptions: {
+            headers: {"X-CSRFToken": '{{ token }}'}
+        },
+        formatSearch: function () {
+            return 'Questions';
+        },
+        queryParams: function (params) {
+            params.csrfmiddlewaretoken = '{{ token }}';
+            params.id ={{ id }}
+            return params;
+        }
+    })
+
+    function Refresh() {
+        $('#table').bootstrapTable('refresh', {silent: true})
+    }
+</script>
+</body>
+</html>

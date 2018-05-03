@@ -9,8 +9,8 @@ class Settings(object):
 
 def autodiscover():
     """
-    Auto-discover INSTALLED_APPS admin.py modules and fail silently when
-    not present. This forces an import on them to register any admin bits they
+    Auto-discover INSTALLED_APPS myadmin.py modules and fail silently when
+    not present. This forces an import on them to register any myadmin bits they
     may want.
     """
 
@@ -50,7 +50,7 @@ def autodiscover():
 
     for app_config in apps.get_app_configs():
         mod = import_module(app_config.name)
-        # Attempt to import the app's admin module.
+        # Attempt to import the app's myadmin module.
         try:
             before_import_registry = site.copy_registry()
             import_module('%s.adminx' % app_config.name)
@@ -62,7 +62,7 @@ def autodiscover():
             site.restore_registry(before_import_registry)
 
             # Decide whether to bubble up this error. If the app just
-            # doesn't have an admin module, we can ignore the error
+            # doesn't have an myadmin module, we can ignore the error
             # attempting to import it, otherwise we want it to bubble up.
             if module_has_submodule(mod, 'adminx'):
                 raise

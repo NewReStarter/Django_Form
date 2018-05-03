@@ -18,7 +18,7 @@ class DeleteAdminView(ModelAdminView):
     delete_confirmation_template = None
 
     def init_request(self, object_id, *args, **kwargs):
-        "The 'delete' admin view for this model."
+        "The 'delete' myadmin view for this model."
         self.obj = self.get_object(unquote(object_id))
 
         if not self.has_delete_permission(self.obj):
