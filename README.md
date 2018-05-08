@@ -21,6 +21,7 @@ MySQL 5.7.21
 
 ### Urls
 `/myadmin` to access data panel 
+
 `/xadmin` to edit the database
 
 ### Introduction
@@ -35,6 +36,8 @@ This project is supposed to be a template project for Form Input Task. Data are 
 ```
 [{"id": 4, "text": "Radio Test", "questions": [{"answer": ["10-20"], "id": 6, "text": "age", "addtion_info": ""}, {"answer": ["female"], "id": 7, "text": "Gender", "addtion_info": ""}, {"answer": ["chinese"], "id": 8, "text": "language", "addtion_info": ""}]}, {"id": 5, "text": "Personal Info", "questions": [{"answer": ["Test"], "id": 9, "text": "Name", "addtion_info": "EN or CH"}, {"answer": ["2018-05-03"], "id": 10, "text": "DOB", "addtion_info": "Date of Birth"}, {"answer": ["ziliugao@gmail.com", "lawrence.ehrdesign@gmail.com"], "id": 11, "text": "Email", "addtion_info": ""}]}, {"id": 6, "text": "Select Test", "questions": [{"answer": ["JHO"], "id": 12, "text": "Company", "addtion_info": ""}, {"answer": ["CityU"], "id": 13, "text": "University", "addtion_info": ""}]}, {"id": 7, "text": "Textarea Test", "questions": [{"answer": ["No Statement so far"], "id": 14, "text": "Statement", "addtion_info": "Write your statement below"}]}]
 ```
+
+Visit [project wiki](https://github.com/NewReStarter/Django_Form/wiki) to know th how to get start and the details.
 
 ### Project Features
 
