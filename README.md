@@ -66,6 +66,7 @@ Scoring | Easy | Short | Iterate through the List and match each criteria.
 Email | Easy | Short | Use [Django Email Component](https://docs.djangoproject.com/en/2.0/topics/email/) to do so.
 Intereacting charts and table | Medium | Long | Query the data for each key input and group the data. Note that for each key input, the query function has to be rewritten.
 Generic chart | Difficult | Long | This require a extra database notation(new columns) for any key input to generate right data input for highchart API. [QuerySet](https://docs.djangoproject.com/zh-hans/2.0/ref/models/querysets/) May not be sufficient enough, noSQLDB may be needed. Meanwhile redesgin of current highchart data input port, the JSON List, is also required.
+File uploading | Easy | Short | Use [Django FileUpload component](https://docs.djangoproject.com/en/2.0/topics/http/file-uploads/)
 PDF Styling | Easy | Long | Static style of CSS should be added.
 
 #### Time Scale
